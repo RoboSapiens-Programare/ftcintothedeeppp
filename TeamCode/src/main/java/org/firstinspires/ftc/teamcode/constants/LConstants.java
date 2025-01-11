@@ -4,21 +4,24 @@ import com.pedropathing.localization.Encoder;
 import com.pedropathing.localization.constants.TwoWheelConstants;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class LConstants {
     static {
-        TwoWheelConstants.forwardTicksToInches = 0.00053;
-        TwoWheelConstants.strafeTicksToInches = 0.00053;
 
-        // TODO : modify these values according to finished robot
 
-        TwoWheelConstants.forwardY = 1;
-        TwoWheelConstants.strafeX = -2.5;
-        TwoWheelConstants.forwardEncoder_HardwareMapName = "leftRear";
-        TwoWheelConstants.strafeEncoder_HardwareMapName = "rightRear";
-        TwoWheelConstants.forwardEncoderDirection = Encoder.REVERSE;
-        TwoWheelConstants.strafeEncoderDirection = Encoder.REVERSE;
-        TwoWheelConstants.IMU_HardwareMapName = "imu";
-        TwoWheelConstants.IMU_Orientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.LEFT);
+
+        PinpointConstants.forwardY = -4.527;
+        PinpointConstants.strafeX = -4.134;
+        PinpointConstants.distanceUnit = DistanceUnit.INCH;
+        PinpointConstants.hardwareMapName = "pinpoint";
+        PinpointConstants.useYawScalar = false;
+        PinpointConstants.yawScalar = 1.0;
+        PinpointConstants.useCustomEncoderResolution = false;
+        PinpointConstants.encoderResolution = GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD;
+        PinpointConstants.customEncoderResolution = 13.26291192;
+        PinpointConstants.forwardEncoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
+        PinpointConstants.strafeEncoderDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
 
     }
 }
