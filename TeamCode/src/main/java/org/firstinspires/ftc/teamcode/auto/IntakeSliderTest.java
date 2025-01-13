@@ -13,6 +13,7 @@ public class IntakeSliderTest extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
 
     private Timer timeoutTimer, actionTimer;
+    private boolean singleton, singleton2;
 
     // will wait {duration} minutes
     private final double duration = 30;
@@ -26,6 +27,9 @@ public class IntakeSliderTest extends OpMode {
 
         timeoutTimer.resetTimer();
         actionTimer.resetTimer();
+
+        singleton = true;
+        singleton2 = true;
 
         robot.intake.ManualLevel(0,1);
         robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
@@ -42,12 +46,20 @@ public class IntakeSliderTest extends OpMode {
         if (timeoutTimer.getElapsedTimeSeconds() >= duration*60) {
             return;
         }
+        if (singleton) {
 
-        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
+            robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
+            singleton = false;
+        }
         if (actionTimer.getElapsedTimeSeconds() > 3) {
-            robot.intake.ManualLevel(0, 1);
+            if (singleton2) {
+                robot.intake.ManualLevel(0, 1);
+                singleton2 = false;
+            }
             if (actionTimer.getElapsedTimeSeconds() > 6) {
                 actionTimer.resetTimer();
+                singleton = true;
+                singleton2 = true;
             }
         }
         int mins = timeoutTimer.getElapsedTimeSeconds()/60;
