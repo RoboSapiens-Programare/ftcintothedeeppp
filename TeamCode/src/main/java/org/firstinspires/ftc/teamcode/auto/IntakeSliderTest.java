@@ -50,9 +50,10 @@ public class IntakeSliderTest extends OpMode {
                 actionTimer.resetTimer();
             }
         }
-
-        telemetry.addData("elapsed seconds", timeoutTimer.getElapsedTimeSeconds());
-        telemetry.addData("elapsed minutes", timeoutTimer.getElapsedTimeSeconds()/60);
+        int mins = timeoutTimer.getElapsedTimeSeconds()/60;
+        int secs = (int)timeoutTimer.getElapsedTimeSeconds() % 60;
+        String time = Integer.toString(mins)+":"+Integer.toString(secs);
+        telemetry.addData("elapsed time", time);
         telemetry.update();
     }
 }
