@@ -28,6 +28,11 @@ public class IntakeSliderTest extends OpMode {
         actionTimer.resetTimer();
 
         robot.intake.ManualLevel(0,1);
+        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+            robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+            robot.intake.setPivot(universalValues.INTAKE_INT);
+            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+            robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
 
         telemetry.update();
     }
