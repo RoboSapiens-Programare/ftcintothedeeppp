@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.constants;
 
 import com.pedropathing.localization.Encoder;
+import com.pedropathing.localization.GoBildaPinpointDriver;
+import com.pedropathing.localization.constants.PinpointConstants;
 import com.pedropathing.localization.constants.TwoWheelConstants;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
