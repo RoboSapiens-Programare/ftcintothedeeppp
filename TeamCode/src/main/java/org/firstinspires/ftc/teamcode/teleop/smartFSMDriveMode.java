@@ -9,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_D
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_UP;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_DOWN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_UP;
@@ -17,6 +18,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TIMER;
 import static java.lang.Math.abs;
@@ -38,40 +40,40 @@ import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
 
 /* THIS IS EXACTLY THE CODE FROM FSM DRIVE MODE
-*  It simply adds an autonomous path when DRIVER #1 presses CIRCLE after PICKING UP the sample
-*  Pressing it once again should override it and stop the path following.
-*  Once that happened, the path won't be followed from where it stopped, but from the beginning.
-*  THIS MODEL ONLY ACCOUNTS FOR TAKING SAMPLES FROM THE SPECIMEN-SIDE IN THE TRACTION ZONE
-*  Ex start point for Pedro Path generator: 70, 40 */
+ *  It simply adds an autonomous path when DRIVER #1 presses CIRCLE after PICKING UP the sample
+ *  Pressing it once again should override it and stop the path following.
+ *  Once that happened, the path won't be followed from where it stopped, but from the beginning.
+ *  THIS MODEL ONLY ACCOUNTS FOR TAKING SAMPLES FROM THE SPECIMEN-SIDE IN THE TRACTION ZONE
+ *  Ex start point for Pedro Path generator: 70, 40 */
 
 // CURRENT STATUS: NOT TESTED
 
 @TeleOp(name = "SMART FSM DRIVE MODE", group = "FSMTELEOP")
 public class smartFSMDriveMode extends OpMode {
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot;
-    private Follower follower;
+
+    private double clawPivot = CLAW_HORIZONTAL;
     private final ElapsedTime intakeTimer = new ElapsedTime();
     private final ElapsedTime outtakeTimer = new ElapsedTime();
+
+
+    // TODO: change to last pose of the autonomy
+    private final Pose startPose = new Pose(2, 32, 0);
+    private final Pose pickup = new Pose(72, 47, Math.toRadians(90));
+    private final Pose observationZone = new Pose(22, 12, Math.toRadians(180));
+    private final Pose observationZoneWait = new Pose(30, 12, Math.toRadians(180));
+    private PathChain toObservationZonePath, retreat;
+
+    private org.firstinspires.ftc.teamcode.subsystems.robot robot;
+    private Follower follower;
     private boolean isHorizontal = true;
     private boolean isStarted = true;
     private boolean isPressed = false;
     private boolean isSquare = false;
     private boolean isTimer = true;
     private boolean isMoving = false;
-
     private boolean isAutoRunning = false;
-    private boolean autoSingleton = true, autoSingleton2 = true;
+    private boolean autoSingleton = true;
     private Timer actionTimer;
-
-    Pose pickup = new Pose(72, 47, Math.toRadians(90));
-    Pose observationZone = new Pose(22, 12, Math.toRadians(180));
-    Pose observationZoneWait = new Pose(30, 12, Math.toRadians(180));
-
-    PathChain toObservationZonePath, retreat;
-
-    // TODO: change to last pose of the autonomy
-    private final Pose startPose = new Pose(0, 0, 0);
-
     private enum IntakeState {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
         OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE,
@@ -79,15 +81,10 @@ public class smartFSMDriveMode extends OpMode {
         AUTO
     }
 
-    private  enum AutoState {
+    private enum AutoState {
         DEFAULT, COLLECT, TO_OBSERVATION_ZONE, RETREAT
     }
     private AutoState autoState = AutoState.COLLECT;
-
-    private static final int OUTTAKE_LOW = 0;
-    private static final int INTAKE_LOW = 0;
-
-    private double clawPivot = CLAW_HORIZONTAL;
     private IntakeState intakeState = IntakeState.INTAKE_START;
 
     private void generatePaths() {
@@ -205,16 +202,16 @@ public class smartFSMDriveMode extends OpMode {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
             robot.intake.setPivot(INTAKE_UP);
-            if(intakeTimer.seconds() > 0.5) {
-                robot.intake.ManualLevel(INTAKE_LOW, 1);
+            if (intakeTimer.seconds() > 0.5) {
+                robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 intakeTimer.reset();
                 intakeState = IntakeState.INTAKE_RETRACT;
             }
         }
-        if(gamepad1.cross){
+        if (gamepad1.cross) {
             robot.intake.setPivot(INTAKE_INT);
         }
-        if(gamepad1.square){
+        if (gamepad1.square) {
             robot.intake.setPivot(INTAKE_DOWN);
         }
     }
@@ -226,14 +223,14 @@ public class smartFSMDriveMode extends OpMode {
             if (intakeTimer.seconds() > CLAW_TIMER) {
                 robot.intake.OpenIntake(CLAW_OPEN);
                 robot.outtake.CloseOuttake(OUTTAKE_CLOSE - 0.07);
-                if(intakeTimer.seconds() > CLAW_TIMER + 0.3) {
+                if (intakeTimer.seconds() > CLAW_TIMER + 0.3) {
                     robot.intake.ManualLevel(300, 1);
                     intakeTimer.reset();
                 }
             }
-            if(robot.intake.intakeMotor.getCurrentPosition() > 200){
+            if (robot.intake.intakeMotor.getCurrentPosition() > 200) {
                 robot.intake.setPivot(INTAKE_INT);
-                robot.intake.ManualLevel(INTAKE_LOW,1);
+                robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 intakeState = IntakeState.INTAKE_START;
             }
         }
@@ -241,7 +238,7 @@ public class smartFSMDriveMode extends OpMode {
 
     private void handleOuttakeMid() {
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
@@ -256,7 +253,7 @@ public class smartFSMDriveMode extends OpMode {
 
     private void handleOuttakeExtend() {
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
@@ -272,23 +269,23 @@ public class smartFSMDriveMode extends OpMode {
     }
 
     private void handleOuttakeSample() {
-        if(gamepad1.square && !isSquare) {
+        if (gamepad1.square && !isSquare) {
             isSquare = true;
             isTimer = true;
         }
-        if(abs(gamepad1.left_stick_y) > 0.02 && isSquare && !isMoving){
+        if (abs(gamepad1.left_stick_y) > 0.02 && isSquare && !isMoving) {
             isMoving = true;
         }
-        if(isSquare && isMoving){
-            if(isTimer){
+        if (isSquare && isMoving) {
+            if (isTimer) {
                 intakeTimer.reset();
                 isTimer = false;
             }
             robot.outtake.setPivot(OUTTAKE_CLIPON_DOWN);
-            if(intakeTimer.seconds() > 0.3){
+            if (intakeTimer.seconds() > 0.3) {
                 robot.outtake.OpenOuttake(OUTTAKE_OPEN);
 
-                if(intakeTimer.seconds() > 0.5) {
+                if (intakeTimer.seconds() > 0.5) {
                     robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
                     robot.outtake.setPivot(OUTTAKE_COLLECT);
                     intakeState = IntakeState.INTAKE_START;
@@ -303,6 +300,7 @@ public class smartFSMDriveMode extends OpMode {
         actionTimer.resetTimer();
         autoSingleton = true;
     }
+
     private void handleAuto() {
         // STOP AUTO
         if (gamepad1.circle) {
@@ -313,12 +311,12 @@ public class smartFSMDriveMode extends OpMode {
         }
 
         switch (autoState) {
-            // After sample hax been grabbed, retract the claw
+            // After sample has been grabbed, retract the claw
             case COLLECT:
                 robot.intake.setPivot(INTAKE_INT);
                 robot.intake.setClawPivot(CLAW_HORIZONTAL);
                 clawPivot = CLAW_HORIZONTAL;
-                robot.intake.ManualLevel(INTAKE_LOW, 1);
+                robot.intake.ManualLevel(INTAKE_RETRACT, 1);
 
                 changeAutoState(AutoState.TO_OBSERVATION_ZONE);
                 break;
@@ -422,10 +420,9 @@ public class smartFSMDriveMode extends OpMode {
                 intakeState = IntakeState.INTAKE_START;
                 break;
         }
-        if(intakeState == IntakeState.OUTTAKE_SAMPLE) {
+        if (intakeState == IntakeState.OUTTAKE_SAMPLE) {
             updateFollower(0.4);
-        }
-        else updateFollower(1);
+        } else updateFollower(1);
         telemetry.update();
     }
 }

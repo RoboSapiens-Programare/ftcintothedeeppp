@@ -10,13 +10,22 @@ public class universalValues {
     public static double INTAKE_INT = 0.425;
     public static double INTAKE_INIT = 0.85;
 
+    // PIVOT position for when the sample is to be transferred
+    // TODO: check actual value for *_LOOSE and INTAKE_TRANSFER
+    public static double INTAKE_TRANSFER = 0.7;
+
+
+    public static double CLAW_LOOSE = 0.50;
     public static double CLAW_OPEN = 0.46;
     public static double CLAW_CLOSE = 0.53;
     public static double CLAW_VERTICAL = 0.4;
     public static double CLAW_HORIZONTAL = 0.72;
 
+
     public static double OUTTAKE_DUMP_BUCKET = 0.65;
     public static double OUTTAKE_COLLECT = 0.04;
+
+    public static double OUTTAKE_LOOSE = 0.82;
     public static double OUTTAKE_OPEN = 0.708;
     public static double OUTTAKE_OPEN_BAR = 0.60;
     public static double OUTTAKE_CLOSE = 0.85;
@@ -35,4 +44,6 @@ public class universalValues {
     public static int INTAKE_EXTEND = 675;
     public static int OUTTAKE_EXTEND_MID = 800;
     public static int OUTTAKE_EXTEND = 2200;
+    public static int OUTTAKE_RETRACT = 0;
+    public static int INTAKE_RETRACT = 0;
 }
