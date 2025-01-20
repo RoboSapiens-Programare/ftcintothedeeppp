@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 public class intake {
     public Servo pivotin, pivotin2, pivotIntake, intake;
 
-    public DcMotorEx intakeMotor;
+    public DcMotorEx intakeMotor, intakeMotor2;
 
     public TouchSensor intakeLimit;
 
@@ -26,9 +26,10 @@ public class intake {
 
         pivotin.setDirection(Servo.Direction.FORWARD);
         pivotin2.setDirection(Servo.Direction.REVERSE);
-        intakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        intakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
     }
 
     public void setPivot(double position) {

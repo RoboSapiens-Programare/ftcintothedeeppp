@@ -15,11 +15,12 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_UP;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TIMER;
 import static java.lang.Math.abs;
 
@@ -32,8 +33,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.robot;
 
-@TeleOp(name = "FSM DRIVE MODE", group = "FSMTELEOP")
-public class fsmDriveMode extends OpMode {
+@TeleOp(name = "FSM DRIVE MODE NEW", group = "FSMTELEOP")
+public class fsmDriveModeNew extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot;
     private Follower follower;
     private final ElapsedTime intakeTimer = new ElapsedTime();
@@ -47,7 +48,8 @@ public class fsmDriveMode extends OpMode {
 
     private enum IntakeState {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
-        OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE
+        OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE,
+        TRANSFER
     }
 
     private double clawPivot = CLAW_HORIZONTAL;
@@ -58,7 +60,7 @@ public class fsmDriveMode extends OpMode {
         robot.intake.CloseIntake(CLAW_CLOSE);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
-        robot.outtake.setPivot(OUTTAKE_COLLECT);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
         robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
     }
 
@@ -128,25 +130,19 @@ public class fsmDriveMode extends OpMode {
     private void handleIntakeClawCollectPosition() {
         if (gamepad1.left_bumper) {
             robot.intake.CloseIntake(CLAW_CLOSE);
-            robot.outtake.setPivot(OUTTAKE_COLLECT);
         } else if (gamepad1.right_bumper) {
             robot.intake.OpenIntake(CLAW_OPEN - 0.185);
-            robot.outtake.setPivot(OUTTAKE_COLLECT);
         }
 
         adjustClawPivot();
         adjustClawPosition();
 
         if (gamepad1.left_trigger > 0.1) {
-            robot.outtake.OpenOuttake(OUTTAKE_OPEN);
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.setPivot(INTAKE_UP);
-            if(intakeTimer.seconds() > 0.5) {
-                robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-                intakeTimer.reset();
-                intakeState = IntakeState.INTAKE_RETRACT;
-            }
+
+            robot.intake.setPivot(INTAKE_INT);
+            intakeState = IntakeState.TRANSFER;
         }
         if(gamepad1.cross){
             robot.intake.setPivot(INTAKE_INT);
@@ -156,24 +152,15 @@ public class fsmDriveMode extends OpMode {
         }
     }
 
-    private void handleIntakeRetract() {
-        if (robot.intake.intakeLimit.isPressed()) isPressed = true;
-        if (isPressed) {
-            robot.intake.setPivot(INTAKE_UP);
-            if (intakeTimer.seconds() > CLAW_TIMER) {
-                robot.intake.OpenIntake(CLAW_OPEN);
-                robot.outtake.CloseOuttake(OUTTAKE_CLOSE - 0.07);
-                if(intakeTimer.seconds() > CLAW_TIMER + 0.3) {
-                    robot.intake.ManualLevel(300, 1);
-                    intakeTimer.reset();
-                }
-            }
-            if(robot.intake.intakeMotor.getCurrentPosition() > 200){
-                robot.intake.setPivot(INTAKE_INT);
-                robot.intake.ManualLevel(INTAKE_RETRACT,1);
-                intakeState = IntakeState.INTAKE_START;
-            }
+    private void handleTransfer() {
+        robot.universalTransfer.transfer();
+
+        telemetry.addData("transfer completed", robot.universalTransfer.isTransferCompleted());
+        if (!robot.universalTransfer.isTransferCompleted()){
+            return;
         }
+
+        intakeState = IntakeState.OUTTAKE_MID;
     }
 
     private void handleOuttakeMid() {
@@ -192,6 +179,8 @@ public class fsmDriveMode extends OpMode {
     }
 
     private void handleOuttakeExtend() {
+        robot.universalTransfer.resetTransfer();
+
         if (gamepad2.cross) {
             robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
@@ -203,7 +192,7 @@ public class fsmDriveMode extends OpMode {
     }
 
     private void handleOuttakeRetract() {
-        robot.outtake.setPivot(OUTTAKE_COLLECT);
+        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         intakeState = IntakeState.INTAKE_START;
     }
@@ -272,6 +261,7 @@ public class fsmDriveMode extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("valoare glisiera", robot.intake.intakeMotor.getCurrentPosition());
+        telemetry.addData("State", intakeState);
 
         switch (intakeState) {
 
@@ -284,8 +274,8 @@ public class fsmDriveMode extends OpMode {
             case INTAKE_CLAW_COLLECT_POSITION:
                 handleIntakeClawCollectPosition();
                 break;
-            case INTAKE_RETRACT:
-                handleIntakeRetract();
+            case TRANSFER:
+                handleTransfer();
                 break;
             case OUTTAKE_MID:
                 handleOuttakeMid();

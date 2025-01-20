@@ -36,9 +36,9 @@ repositories {
     }
 }
 
-dependencies {
-    implementation 'dev.frozenmilk:Sinister:2.0.1'
-    implementation "dev.frozenmilk.sinister:Sloth:0.0.1"
-}
+//dependencies {
+//    implementation 'dev.frozenmilk:Sinister:2.0.1'
+//    implementation "dev.frozenmilk.sinister:Sloth:0.0.1"
+//}
 
 apply from: '../build.dependencies.gradle'

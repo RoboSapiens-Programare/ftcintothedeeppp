@@ -36,13 +36,13 @@ public class outtake {
         outtakeMotor.setTargetPosition(ManualTarget);
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        if(outtakeMotor.getCurrentPosition() < ManualTarget)
+        if(outtakeMotor.getCurrentPosition() > ManualTarget)
         {
-            outtakeMotor.setPower(-power);
+            outtakeMotor.setPower(power);
         }
         else
         {
-            outtakeMotor.setPower(power);
+            outtakeMotor.setPower(-power);
         }
     }
 
