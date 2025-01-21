@@ -60,11 +60,12 @@ public class fsmDriveModeNew extends OpMode {
         robot.intake.CloseIntake(CLAW_CLOSE);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
-        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
         robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
     }
 
     private void handleIntakeStart() {
+        robot.universalTransfer.resetTransfer();
         isPressed = false;
         isSquare = false;
         isMoving = false;
@@ -97,7 +98,7 @@ public class fsmDriveModeNew extends OpMode {
             robot.intake.setPivot(INTAKE_DOWN);
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.OpenIntake(CLAW_OPEN - 0.185);
+            robot.intake.OpenIntake(CLAW_OPEN);
             intakeTimer.reset();
             intakeState = IntakeState.INTAKE_CLAW_COLLECT_POSITION;
         }
@@ -131,7 +132,7 @@ public class fsmDriveModeNew extends OpMode {
         if (gamepad1.left_bumper) {
             robot.intake.CloseIntake(CLAW_CLOSE);
         } else if (gamepad1.right_bumper) {
-            robot.intake.OpenIntake(CLAW_OPEN - 0.185);
+            robot.intake.OpenIntake(CLAW_OPEN);
         }
 
         adjustClawPivot();
@@ -160,7 +161,7 @@ public class fsmDriveModeNew extends OpMode {
             return;
         }
 
-        intakeState = IntakeState.OUTTAKE_MID;
+        intakeState = IntakeState.INTAKE_START;
     }
 
     private void handleOuttakeMid() {
