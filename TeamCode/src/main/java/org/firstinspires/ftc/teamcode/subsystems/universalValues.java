@@ -13,10 +13,10 @@ public class universalValues {
 
     // PIVOT position for when the sample is to be transferred
     // TODO: check actual value for *_LOOSE and INTAKE_TRANSFER
-    public static double INTAKE_TRANSFER = 0.695;
+    public static double INTAKE_TRANSFER = 0.725;
 
 
-    public static double CLAW_LOOSE = 0.48;
+    public static double CLAW_LOOSE = 0.47;
     public static double CLAW_OPEN = 0.7;
     public static double CLAW_CLOSE = 0.4;
     public static double CLAW_VERTICAL = 0.4;

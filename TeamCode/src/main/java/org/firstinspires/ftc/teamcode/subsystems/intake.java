@@ -41,13 +41,13 @@ public class intake {
         intakeMotor.setTargetPosition(ManualTarget);
         intakeMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        if(intakeMotor.getCurrentPosition() < ManualTarget)
-        {
+        if (intakeMotor.getCurrentPosition() < ManualTarget) {
             intakeMotor.setPower(power);
-        }
-        else if(!intakeLimit.isPressed() && intakeMotor.getCurrentPosition() > ManualTarget)
-        {
+        } else if (!intakeLimit.isPressed() && intakeMotor.getCurrentPosition() > ManualTarget) {
             intakeMotor.setPower(-power);
+        } else {
+            intakeMotor.setPower(0);
+            intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         }
     }
 
