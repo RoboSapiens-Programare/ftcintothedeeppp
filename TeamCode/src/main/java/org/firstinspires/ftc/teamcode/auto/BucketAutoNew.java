@@ -219,8 +219,9 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
                         robot.intake.setPivot(universalValues.INTAKE_INT);
-                        robot.universalTransfer.transfer();
 
+                        robot.universalTransfer.transfer();
+                        follower.followPath(scoreFirstSample);
                         changeAutoState(PathState.SCORE_FIRST);
                     }
                 }
