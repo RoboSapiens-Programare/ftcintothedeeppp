@@ -87,19 +87,10 @@ public class UniversalTransfer {
                                         if (transferStep == 7) {
                                             intake.CloseIntake(universalValues.CLAW_OPEN);
                                             outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
-                                            outtake.OpenOuttake(universalValues.OUTTAKE_LOOSE);
+                                            intake.setPivot(universalValues.INTAKE_INT);
 
-                                            ++transferStep;
-                                        }
-
-                                        if (timer.getElapsedTimeSeconds() > 2.7) {
-                                            if (transferStep == 8) {
-                                                intake.setPivot(universalValues.INTAKE_INT);
-                                                outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-
-                                                transferStep = -1;
-                                                transferCompleted = true;
-                                            }
+                                            transferStep = -1;
+                                            transferCompleted = true;
                                         }
                                     }
                                 }

@@ -9,7 +9,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_D
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_UP;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_DOWN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_UP;
@@ -18,7 +17,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TIMER;
 import static java.lang.Math.abs;
@@ -26,8 +24,6 @@ import static java.lang.Math.abs;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.robot;
@@ -49,6 +45,9 @@ public class fsmDriveMode extends OpMode {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
         OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE
     }
+
+    private static final int OUTTAKE_LOW = 0;
+    private static final int INTAKE_LOW = 0;
 
     private double clawPivot = CLAW_HORIZONTAL;
     private IntakeState intakeState = IntakeState.INTAKE_START;
@@ -143,7 +142,7 @@ public class fsmDriveMode extends OpMode {
             clawPivot = CLAW_HORIZONTAL;
             robot.intake.setPivot(INTAKE_UP);
             if(intakeTimer.seconds() > 0.5) {
-                robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+                robot.intake.ManualLevel(INTAKE_LOW, 1);
                 intakeTimer.reset();
                 intakeState = IntakeState.INTAKE_RETRACT;
             }
@@ -170,7 +169,7 @@ public class fsmDriveMode extends OpMode {
             }
             if(robot.intake.intakeMotor.getCurrentPosition() > 200){
                 robot.intake.setPivot(INTAKE_INT);
-                robot.intake.ManualLevel(INTAKE_RETRACT,1);
+                robot.intake.ManualLevel(INTAKE_LOW,1);
                 intakeState = IntakeState.INTAKE_START;
             }
         }
@@ -178,7 +177,7 @@ public class fsmDriveMode extends OpMode {
 
     private void handleOuttakeMid() {
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+            robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
@@ -193,7 +192,7 @@ public class fsmDriveMode extends OpMode {
 
     private void handleOuttakeExtend() {
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+            robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
@@ -251,30 +250,11 @@ public class fsmDriveMode extends OpMode {
         telemetry.update();
         follower.startTeleopDrive();
         initializeRobot();
-
-        DcMotorEx leftRear;
-        DcMotorEx rightRear;
-        DcMotorEx leftFront;
-        DcMotorEx rightFront;
-
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
-
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
     }
 
     @Override
     public void loop() {
-        telemetry.addData("valoare glisiera", robot.intake.intakeMotor.getCurrentPosition());
-
         switch (intakeState) {
-
             case INTAKE_START:
                 handleIntakeStart();
                 break;

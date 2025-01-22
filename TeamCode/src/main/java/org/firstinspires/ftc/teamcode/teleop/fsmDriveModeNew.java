@@ -1,5 +1,13 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
@@ -10,6 +18,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_E
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_TRANSFER;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_UP;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_DOWN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_UP;
@@ -19,19 +28,29 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_SPECIMEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TIMER;
 import static java.lang.Math.abs;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.PoseUpdater;
+import com.pedropathing.util.Constants;
+import com.pedropathing.util.DashboardPoseTracker;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.constants.FConstants;
+import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
+
+import java.util.Arrays;
+import java.util.List;
 
 @TeleOp(name = "FSM DRIVE MODE NEW", group = "FSMTELEOP")
 public class fsmDriveModeNew extends OpMode {
@@ -46,6 +65,12 @@ public class fsmDriveModeNew extends OpMode {
     private boolean isTimer = true;
     private boolean isMoving = false;
 
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
+    private List<DcMotorEx> motors;
+
     private enum IntakeState {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
         OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE,
@@ -56,7 +81,7 @@ public class fsmDriveModeNew extends OpMode {
     private IntakeState intakeState = IntakeState.INTAKE_START;
 
     private void initializeRobot() {
-        robot.intake.ManualLevel(0, 1);
+        robot.intake.ManualLevel(INTAKE_RETRACT, 1);
         robot.intake.CloseIntake(CLAW_CLOSE);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
@@ -66,6 +91,8 @@ public class fsmDriveModeNew extends OpMode {
 
     private void handleIntakeStart() {
         robot.universalTransfer.resetTransfer();
+        robot.intake.ManualLevel(INTAKE_RETRACT, 0.5);
+        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
         isPressed = false;
         isSquare = false;
         isMoving = false;
@@ -74,7 +101,7 @@ public class fsmDriveModeNew extends OpMode {
             isStarted = false;
         }
         if (gamepad1.right_trigger > 0.1) {
-            robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+            robot.intake.ManualLevel(INTAKE_EXTEND, 0.75);
             intakeState = IntakeState.INTAKE_EXTEND;
         }
         if (intakeTimer.seconds() > 0.2) {
@@ -82,13 +109,13 @@ public class fsmDriveModeNew extends OpMode {
             robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
         }
         if (gamepad2.triangle) {
-            robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 1);
+            robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 0.75);
+            outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_MID;
         }
-        if (gamepad2.square) {
-            robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
+        if (gamepad1.square) {
             intakeTimer.reset();
-            robot.outtake.OpenOuttake(OUTTAKE_CLOSE);
+            outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_SAMPLE;
         }
     }
@@ -130,6 +157,7 @@ public class fsmDriveModeNew extends OpMode {
 
     private void handleIntakeClawCollectPosition() {
         if (gamepad1.left_bumper) {
+            robot.intake.ManualLevel(INTAKE_EXTEND-50, 0.8);
             robot.intake.CloseIntake(CLAW_CLOSE);
         } else if (gamepad1.right_bumper) {
             robot.intake.OpenIntake(CLAW_OPEN);
@@ -146,10 +174,13 @@ public class fsmDriveModeNew extends OpMode {
             intakeState = IntakeState.TRANSFER;
         }
         if(gamepad1.cross){
-            robot.intake.setPivot(INTAKE_INT);
+            robot.intake.setPivot(INTAKE_DOWN);
         }
         if(gamepad1.square){
-            robot.intake.setPivot(INTAKE_DOWN);
+            robot.intake.setPivot(INTAKE_INT);
+        }
+        if (gamepad1.triangle) {
+            robot.intake.setPivot(INTAKE_TRANSFER);
         }
     }
 
@@ -166,7 +197,7 @@ public class fsmDriveModeNew extends OpMode {
 
     private void handleOuttakeMid() {
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+            outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
@@ -183,7 +214,7 @@ public class fsmDriveModeNew extends OpMode {
         robot.universalTransfer.resetTransfer();
 
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
@@ -193,42 +224,48 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void handleOuttakeRetract() {
+
         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-        intakeState = IntakeState.INTAKE_START;
+        if (outtakeTimer.seconds()>0.35)
+        {
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+            intakeState = IntakeState.INTAKE_START;
+        }
     }
 
     private void handleOuttakeSample() {
-        if(gamepad1.square && !isSquare) {
-            isSquare = true;
-            isTimer = true;
-        }
-        if(abs(gamepad1.left_stick_y) > 0.02 && isSquare && !isMoving){
-            isMoving = true;
-        }
-        if(isSquare && isMoving){
-            if(isTimer){
-                intakeTimer.reset();
-                isTimer = false;
-            }
-            robot.outtake.setPivot(OUTTAKE_CLIPON_DOWN);
-            if(intakeTimer.seconds() > 0.3){
-                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-
-                if(intakeTimer.seconds() > 0.5) {
-                    robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
-                    robot.outtake.setPivot(OUTTAKE_COLLECT);
-                    intakeState = IntakeState.INTAKE_START;
-                    intakeTimer.reset();
-                }
+        robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+        if (outtakeTimer.seconds()>0.75)
+        {
+            robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+            if (outtakeTimer.seconds()>1)
+            {
+                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+                intakeState=IntakeState.INTAKE_START;
             }
         }
     }
 
     private void updateFollower(double power) {
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
-        follower.setMaxPower(power);
-        follower.update();
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x; // this is strafing
+        double rx = gamepad1.right_stick_x;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double leftFrontPower = (y + x + rx) / denominator;
+        double leftRearPower = (y - x + rx) / denominator;
+        double rightFrontPower = (y - x - rx) / denominator;
+        double rightRearPower = (y + x - rx) / denominator;
+
+        leftFront.setPower(leftFrontPower);
+        leftRear.setPower(leftRearPower);
+        rightFront.setPower(rightFrontPower);
+        rightRear.setPower(rightRearPower);
     }
 
     @Override
@@ -242,20 +279,29 @@ public class fsmDriveModeNew extends OpMode {
         follower.startTeleopDrive();
         initializeRobot();
 
-        DcMotorEx leftRear;
-        DcMotorEx rightRear;
-        DcMotorEx leftFront;
-        DcMotorEx rightFront;
+        Constants.setConstants(FConstants.class, LConstants.class);
 
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
+        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
+        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
+        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+        leftFront.setDirection(leftFrontMotorDirection);
+        leftRear.setDirection(leftRearMotorDirection);
+        rightFront.setDirection(rightFrontMotorDirection);
+        rightRear.setDirection(rightRearMotorDirection);
+
+        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
+
+        for (DcMotorEx motor : motors) {
+            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
+            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
+            motor.setMotorType(motorConfigurationType);
+        }
+
+        for (DcMotorEx motor : motors) {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
 
     }
 
@@ -263,6 +309,10 @@ public class fsmDriveModeNew extends OpMode {
     public void loop() {
         telemetry.addData("valoare glisiera", robot.intake.intakeMotor.getCurrentPosition());
         telemetry.addData("State", intakeState);
+        telemetry.addData("left joystick x", gamepad1.left_stick_x);
+        telemetry.addData("left joystick y", gamepad1.left_stick_y);
+        telemetry.addData("right joystick x", gamepad1.right_stick_x);
+        telemetry.addData("right joystick y", gamepad1.right_stick_y);
 
         switch (intakeState) {
 
