@@ -4,17 +4,17 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.util.Constants;
-import com.pedropathing.util.Timer;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Constants;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
 @Autonomous(name="Bucket Auto New", group = "Autonomous")
 public class BucketAutoNew extends OpMode {
@@ -25,12 +25,15 @@ public class BucketAutoNew extends OpMode {
 
     private PathChain scorePreload, grabFirstSample, scoreFirstSample, grabSecondSample, scoreSecondSample, pushThirdSample, park;
 
-    private final Pose startPose = new Pose(9.750, 85.000, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(16.200, 128.000, Math.toRadians(-45));
-    private final Pose scorePushPose = new Pose(14.000, 135.000, Math.toRadians(-90));
-    private final Pose grabFirstSamplePose = new Pose(28.000, 131.500, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(28.000, 121.500, Math.toRadians(0));
-    private final Pose parkPose = new Pose(62.000, 95.000, Math.toRadians(-90));
+    private final double OFFSET_X = 0;
+    private final double OFFSET_Y = 0;
+
+    private final Pose startPose = new Pose(9.750 + OFFSET_X, 85.000 + OFFSET_Y, Math.toRadians(-90));
+    private final Pose scorePose = new Pose(16.200 + OFFSET_X, 128.000 + OFFSET_Y, Math.toRadians(-45));
+    private final Pose scorePushPose = new Pose(14.000 + OFFSET_X, 135.000 + OFFSET_Y, Math.toRadians(-90));
+    private final Pose grabFirstSamplePose = new Pose(28.000 + OFFSET_X, 131.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabSecodSamplePose = new Pose(28.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose parkPose = new Pose(62.000 + OFFSET_X, 95.000 + OFFSET_Y, Math.toRadians(-90));
 
     private enum PathState {
         START,
@@ -100,15 +103,15 @@ public class BucketAutoNew extends OpMode {
                         // Line 6
                         new BezierCurve(
                                 new Point(scorePose),
-                                new Point(72.000, 120.000, Point.CARTESIAN),
-                                new Point(72.000, 135.000, Point.CARTESIAN)
+                                new Point(72.000 + OFFSET_X, 120.000 + OFFSET_Y, Point.CARTESIAN),
+                                new Point(72.000 + OFFSET_X, 135.000 + OFFSET_Y, Point.CARTESIAN)
                         )
                 )
                 .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-90))
                 .addPath(
                         // Line 7
                         new BezierLine(
-                                new Point(72.000, 135.000, Point.CARTESIAN),
+                                new Point(72.000 + OFFSET_X, 135.000 + OFFSET_Y, Point.CARTESIAN),
                                 new Point(scorePushPose)
                         )
                 )
@@ -119,7 +122,7 @@ public class BucketAutoNew extends OpMode {
                         // Line 8
                         new BezierCurve(
                                 new Point(scorePushPose),
-                                new Point(60.000, 128.000, Point.CARTESIAN),
+                                new Point(60.000 + OFFSET_X, 128.000 + OFFSET_Y, Point.CARTESIAN),
                                 new Point(parkPose)
                         )
                 )
@@ -131,12 +134,15 @@ public class BucketAutoNew extends OpMode {
     @Override
     public void init() {
         robot = new robot(hardwareMap);
-
+        follower = new Follower(hardwareMap);
+        
         generatePaths();
 
         follower.setStartingPose(startPose);
         Constants.setConstants(FConstants.class, LConstants.class);
 
+        actionTimer = new Timer();
+        
 
         telemetry.update();
 
@@ -149,6 +155,12 @@ public class BucketAutoNew extends OpMode {
         robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
         robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
 
+    }
+
+    @Override
+    public void init_loop() {
+        robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
+        robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
     }
 
     @Override
@@ -169,19 +181,20 @@ public class BucketAutoNew extends OpMode {
     private void autoPathUpdate() {
         switch (pathState) {
             case START:
+                robot.intake.setPivot(universalValues.INTAKE_INT);
 
                 follower.followPath(scorePreload);
-                robot.intake.setPivot(universalValues.INTAKE_INT);
                 changeAutoState(PathState.SCORE_PRELOAD);
                 break;
 
             case SCORE_PRELOAD:
                 // CHECK for reaching position
                 if ((follower.getPose().getX() > scorePose.getX() - 1) &&
-                        (follower.getPose().getY() > scorePose.getY() - 1)) {
+                    (follower.getPose().getY() > scorePose.getY() - 1)) {
                     if (step == 0) {
                         actionTimer.resetTimer();
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
                         ++step;
                     }
 
@@ -192,6 +205,7 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.6) {
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
+                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(grabFirstSample);
                         changeAutoState(PathState.GRAB_FIRST);
@@ -238,6 +252,8 @@ public class BucketAutoNew extends OpMode {
                     if (step == 0) {
                         actionTimer.resetTimer();
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
+
                         ++step;
                     }
 
@@ -248,6 +264,7 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.6) {
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
+                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(grabSecondSample);
                         changeAutoState(PathState.GRAB_SECOND);
@@ -293,16 +310,20 @@ public class BucketAutoNew extends OpMode {
                     if (step == 0) {
                         actionTimer.resetTimer();
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
+
                         ++step;
                     }
 
                     if (step == 1 && actionTimer.getElapsedTimeSeconds() > 0.3) {
                         robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+
                         ++step;
                     }
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.6) {
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
+                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(pushThirdSample);
                         changeAutoState(PathState.PUSH_THIRD);

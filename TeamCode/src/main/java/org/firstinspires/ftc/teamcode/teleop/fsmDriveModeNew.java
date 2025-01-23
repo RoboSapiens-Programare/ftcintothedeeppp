@@ -11,7 +11,6 @@ import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_TIMER;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_VERTICAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_DOWN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
@@ -19,11 +18,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_I
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_TRANSFER;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_UP;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_DOWN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_UP;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
@@ -35,9 +30,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TI
 import static java.lang.Math.abs;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.PoseUpdater;
 import com.pedropathing.util.Constants;
-import com.pedropathing.util.DashboardPoseTracker;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -349,5 +342,11 @@ public class fsmDriveModeNew extends OpMode {
         }
         else updateFollower(1);
         telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+        robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
     }
 }
