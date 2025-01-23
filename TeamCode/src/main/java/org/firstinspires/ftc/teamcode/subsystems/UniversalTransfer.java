@@ -6,6 +6,7 @@ public class UniversalTransfer {
     private org.firstinspires.ftc.teamcode.subsystems.intake intake;
     private org.firstinspires.ftc.teamcode.subsystems.outtake outtake;
     private boolean transferCompleted = false;
+    private boolean samplePickedUp = false;
 
     private Timer timer;
     private boolean timerSingleton = true;
@@ -29,7 +30,9 @@ public class UniversalTransfer {
         if (transferStep == 0) {
             intake.setPivot(universalValues.INTAKE_INT);
             intake.OpenIntake(universalValues.CLAW_LOOSE);
-            intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+
+//            intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+            intake.setClawPivot(universalValues.CLAW_VERTICAL);
 
             outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
             outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
@@ -40,7 +43,8 @@ public class UniversalTransfer {
             if (transferStep == 1) {
                 intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.6);
                 intake.setPivot(universalValues.INTAKE_INIT);
-
+                intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+                samplePickedUp = true;
                 ++transferStep;
             }
 
@@ -107,12 +111,18 @@ public class UniversalTransfer {
         timerSingleton = true;
         transferStep = 0;
         transferCompleted = false;
+        samplePickedUp = false;
     }
 
     public boolean isTransferCompleted() {
         return transferCompleted;
     }
+
+    public boolean isSamplePickedUp() { return samplePickedUp; }
 }
+
+
+
 
 /* USAGE:
  * public void loop() {
