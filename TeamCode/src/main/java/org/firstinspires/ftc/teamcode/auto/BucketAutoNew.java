@@ -25,14 +25,15 @@ public class BucketAutoNew extends OpMode {
 
     private PathChain scorePreload, grabFirstSample, scoreFirstSample, grabSecondSample, scoreSecondSample, pushThirdSample, park;
 
-    private final double OFFSET_X = 0;
-    private final double OFFSET_Y = 0;
+    // TODO: check actual offsets. These are GUESSED from ClipSpecimenOnBar
+    private final double OFFSET_X = 2.5;
+    private final double OFFSET_Y = -4.5;
 
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 85.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose scorePose = new Pose(16.200 + OFFSET_X, 128.000 + OFFSET_Y, Math.toRadians(-45));
     private final Pose scorePushPose = new Pose(14.000 + OFFSET_X, 135.000 + OFFSET_Y, Math.toRadians(-90));
-    private final Pose grabFirstSamplePose = new Pose(28.000 + OFFSET_X, 131.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(28.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabFirstSamplePose = new Pose(24.000 + OFFSET_X, 131.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabSecodSamplePose = new Pose(24.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(0));
     private final Pose parkPose = new Pose(62.000 + OFFSET_X, 95.000 + OFFSET_Y, Math.toRadians(-90));
 
     private enum PathState {
@@ -46,6 +47,8 @@ public class BucketAutoNew extends OpMode {
     }
 
     private PathState pathState = PathState.SCORE_PRELOAD;
+
+    private boolean intakeSliderManip = false;
 
     private void generatePaths() {
         scorePreload = follower.pathBuilder()
@@ -167,6 +170,10 @@ public class BucketAutoNew extends OpMode {
     public void loop() {
         // These loop the movements of the robot
         follower.update();
+
+        if (!intakeSliderManip)
+            robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
+
         autoPathUpdate();
         //transfer();
         // Feedback to Driver Hub
@@ -184,7 +191,7 @@ public class BucketAutoNew extends OpMode {
                 robot.intake.setPivot(universalValues.INTAKE_INT);
 
                 follower.followPath(scorePreload);
-                changeAutoState(PathState.SCORE_PRELOAD);
+                changePathState(PathState.SCORE_PRELOAD);
                 break;
 
             case SCORE_PRELOAD:
@@ -208,7 +215,7 @@ public class BucketAutoNew extends OpMode {
                         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(grabFirstSample);
-                        changeAutoState(PathState.GRAB_FIRST);
+                        changePathState(PathState.GRAB_FIRST);
                     }
                 }
                 break;
@@ -216,6 +223,8 @@ public class BucketAutoNew extends OpMode {
             case GRAB_FIRST:
                 if ((follower.getPose().getX() > grabFirstSamplePose.getX() - 1) &&
                         (follower.getPose().getY() < grabFirstSamplePose.getY() + 1)) {
+                    intakeSliderManip = true;
+
                     if (step == 0) {
                         actionTimer.resetTimer();
                         robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 0.8);
@@ -234,14 +243,15 @@ public class BucketAutoNew extends OpMode {
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
                         robot.intake.setPivot(universalValues.INTAKE_INT);
 
-                        robot.universalTransfer.transfer();
                         follower.followPath(scoreFirstSample);
-                        changeAutoState(PathState.SCORE_FIRST);
+                        changePathState(PathState.SCORE_FIRST);
                     }
                 }
                 break;
 
             case SCORE_FIRST:
+                robot.universalTransfer.transfer();
+
                 // CHECK for reaching position
                 if ((follower.getPose().getX() < scorePose.getX() + 1) &&
                         (follower.getPose().getY() < scorePose.getY() + 1)) {
@@ -267,7 +277,8 @@ public class BucketAutoNew extends OpMode {
                         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(grabSecondSample);
-                        changeAutoState(PathState.GRAB_SECOND);
+                        robot.universalTransfer.resetTransfer();
+                        changePathState(PathState.GRAB_SECOND);
                     }
                 }
                 break;
@@ -275,6 +286,8 @@ public class BucketAutoNew extends OpMode {
             case GRAB_SECOND:
                 if ((follower.getPose().getX() > grabSecodSamplePose.getX() - 1) &&
                         (follower.getPose().getY() < grabSecodSamplePose.getY() + 1)) {
+                    intakeSliderManip = true;
+
                     if (step == 0) {
                         actionTimer.resetTimer();
                         robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 0.8);
@@ -292,18 +305,20 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
                         robot.intake.setPivot(universalValues.INTAKE_INT);
-                        robot.universalTransfer.transfer();
 
                         follower.followPath(scoreSecondSample);
-                        changeAutoState(PathState.SCORE_SECOND);
+                        changePathState(PathState.SCORE_SECOND);
                     }
                 }
                 break;
 
             case SCORE_SECOND:
+                robot.universalTransfer.transfer();
+
                 // CHECK for reaching position
                 if ((follower.getPose().getX() < scorePose.getX() + 1) &&
                         (follower.getPose().getY() > scorePose.getY() - 1)) {
+
                     if (!robot.universalTransfer.isTransferCompleted())
                         break;
 
@@ -326,7 +341,8 @@ public class BucketAutoNew extends OpMode {
                         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(pushThirdSample);
-                        changeAutoState(PathState.PUSH_THIRD);
+                        robot.universalTransfer.resetTransfer();
+                        changePathState(PathState.PUSH_THIRD);
                     }
                 }
                 break;
@@ -336,13 +352,13 @@ public class BucketAutoNew extends OpMode {
                         (follower.getPose().getY() > scorePose.getY() + 1)) {
 
                     follower.followPath(park);
-                    changeAutoState(PathState.PARK);
+                    changePathState(PathState.PARK);
                 }
 
             case PARK:
                 if ((follower.getPose().getX() > parkPose.getX() - 1) &&
                         (follower.getPose().getY() < parkPose.getY() + 1)) {
-                    changeAutoState(PathState.STOP);
+                    changePathState(PathState.STOP);
                 }
 
             default:
@@ -350,8 +366,10 @@ public class BucketAutoNew extends OpMode {
         }
     }
 
-    private void changeAutoState(PathState state) {
+    private void changePathState(PathState state) {
         pathState = state;
         step = 0;
+
+        intakeSliderManip = false;
     }
 }

@@ -52,6 +52,8 @@ public class fsmDriveModeNew extends OpMode {
     private Follower follower;
     private final ElapsedTime intakeTimer = new ElapsedTime();
     private final ElapsedTime outtakeTimer = new ElapsedTime();
+    private final ElapsedTime compactTimer = new ElapsedTime();
+
     private boolean isHorizontal = true;
     private boolean isStarted = true;
     private boolean isPressed = false;
@@ -117,6 +119,7 @@ public class fsmDriveModeNew extends OpMode {
         }
 
         if (gamepad1.circle) {
+            compactTimer.reset();
             intakeState = IntakeState.INTAKE_PRE_COLLECT_COMPACT;
         }
     }
@@ -238,7 +241,7 @@ public class fsmDriveModeNew extends OpMode {
             wallCollect = false;
         }
 
-        if (gamepad1.circle) {
+        if (gamepad1.circle && compactTimer.seconds() > 0.5) {
             robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
             robot.intake.OpenIntake(CLAW_OPEN);
             robot.intake.setPivot(INTAKE_INT);
