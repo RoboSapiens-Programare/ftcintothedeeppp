@@ -42,9 +42,9 @@ public class UniversalTransfer {
         if (timer.getElapsedTimeSeconds() > 0.2) {
             if (transferStep == 1) {
                 intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.6);
-                intake.setPivot(universalValues.INTAKE_INIT);
+                intake.setPivot(0.92);
                 intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-                samplePickedUp = true;
+
                 ++transferStep;
             }
 
@@ -53,6 +53,7 @@ public class UniversalTransfer {
             if (timer.getElapsedTimeSeconds() > 0.8) {
                 if (transferStep == 2) {
                    //outtake.CloseOuttake(universalValues.OUTTAKE_LOOSE);
+                    samplePickedUp = true;
                     intake.CloseIntake(universalValues.CLAW_CLOSE);
                     ++transferStep;
                 }

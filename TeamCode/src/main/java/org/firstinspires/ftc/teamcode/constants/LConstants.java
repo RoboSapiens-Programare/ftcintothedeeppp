@@ -13,17 +13,17 @@ public class LConstants {
 
 
 
-        TwoWheelConstants.forwardTicksToInches = .001989436789;
-        TwoWheelConstants.strafeTicksToInches = .001989436789;
-        TwoWheelConstants.forwardY = 1;
-        TwoWheelConstants.strafeX = -2.5;
-        TwoWheelConstants.forwardEncoder_HardwareMapName = "leftFront";
-        TwoWheelConstants.strafeEncoder_HardwareMapName = "rightFront";
-        TwoWheelConstants.forwardEncoderDirection = Encoder.REVERSE;
-        TwoWheelConstants.strafeEncoderDirection = Encoder.FORWARD;
-        TwoWheelConstants.IMU_HardwareMapName = "imu";
-        TwoWheelConstants.IMU_Orientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.LEFT);
-
+        PinpointConstants.forwardY = -4.035;
+        PinpointConstants.strafeX = -4.528;
+        PinpointConstants.distanceUnit = DistanceUnit.INCH;
+        PinpointConstants.hardwareMapName = "pinpoint";
+        PinpointConstants.useYawScalar = false;
+        PinpointConstants.yawScalar = 1.0;
+        PinpointConstants.useCustomEncoderResolution = false;
+        PinpointConstants.encoderResolution = GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD;
+        PinpointConstants.customEncoderResolution = 13.26291192;
+        PinpointConstants.forwardEncoderDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
+        PinpointConstants.strafeEncoderDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
 
     }
 }

@@ -6,18 +6,18 @@ import com.acmerobotics.dashboard.config.Config;
 public class universalValues {
 
     public static double OUTTAKE_LOOSE = 0.865 ;
-    public static double INTAKE_UP = 0.94;
-    public static double INTAKE_DOWN = 0;
-    public static double INTAKE_INT = 0.415;
-    public static double INTAKE_INIT = 0.75;
+    public static double INTAKE_UP = 1;
+    public static double INTAKE_DOWN = 0.07;
+    public static double INTAKE_INT = 0.423;
+    public static double INTAKE_INIT = 0.82;
 
     // PIVOT position for when the sample is to be transferred
     // TODO: check actual value for *_LOOSE and INTAKE_TRANSFER
-    public static double INTAKE_TRANSFER = 0.812345;
+    public static double INTAKE_TRANSFER = 0.882345;
 
 
-    public static double CLAW_LOOSE = 0.49;
-    public static double CLAW_OPEN = 0.7;
+    public static double CLAW_LOOSE = 0.4185;
+    public static double CLAW_OPEN = 0.55;
     public static double CLAW_CLOSE = 0.4;
 
     public static double CLAW_VERTICAL = 0.4;
@@ -25,7 +25,7 @@ public class universalValues {
     public static double CLAW_FLIPPED = 0.08;
 
     public static double OUTTAKE_DUMP_BUCKET = 0.7;
-    public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.4;
+    public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.37;
     public static double OUTTAKE_COLLECT = 0.04;
     public static double OUTTAKE_OPEN = 0.708;
     public static double OUTTAKE_OPEN_BAR = 0.60;

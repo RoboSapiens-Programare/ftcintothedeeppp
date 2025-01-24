@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class FConstants {
     static {
-        FollowerConstants.localizers = Localizers.TWO_WHEEL;
+        FollowerConstants.localizers = Localizers.PINPOINT;
 
 
 
@@ -16,20 +16,20 @@ public class FConstants {
         FollowerConstants.rightFrontMotorName = "rightFront";
         FollowerConstants.rightRearMotorName = "rightRear";
 
-        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
-        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
         FollowerConstants.useBrakeModeInTeleOp = true;
 
-        FollowerConstants.mass = 10;
+        FollowerConstants.mass = 11;
 
-        FollowerConstants.xMovement = 64;
-        FollowerConstants.yMovement = 48;
+        FollowerConstants.xMovement = 65.97885839744987;
+        FollowerConstants.yMovement = 53.75624400331691;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -28.373801;
-        FollowerConstants.lateralZeroPowerAcceleration = -62.966;
+        FollowerConstants.forwardZeroPowerAcceleration = -26.786229;
+        FollowerConstants.lateralZeroPowerAcceleration = -69.166;
 
         FollowerConstants.zeroPowerAccelerationMultiplier = 2.7;
 
