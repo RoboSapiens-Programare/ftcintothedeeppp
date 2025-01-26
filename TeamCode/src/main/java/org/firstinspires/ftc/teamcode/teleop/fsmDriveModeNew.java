@@ -22,8 +22,10 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_ASCENT_INTERMEDIARY;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_SPECIMEN;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_GRAB_BAR;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TIMER;
@@ -60,6 +62,8 @@ public class fsmDriveModeNew extends OpMode {
     private boolean isTimer = true;
     private boolean isMoving = false;
 
+    private int ascentStep = 0;
+
     private boolean wallCollect = false;
 
     private boolean intakeSliderManip = false;
@@ -76,7 +80,7 @@ public class fsmDriveModeNew extends OpMode {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION,
         INTAKE_PRE_COLLECT_COMPACT, INTAKE_COLLECT_COMPACT,
         INTAKE_EXTEND, OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE,
-        TRANSFER
+        TRANSFER, ASCENT
     }
 
     private double clawPivot = CLAW_HORIZONTAL;
@@ -190,8 +194,12 @@ public class fsmDriveModeNew extends OpMode {
             robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
         }
 
-        if (gamepad2.left_stick_y < 0) {
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+        // lvl 1 ascent
+        if (gamepad2.left_bumper) {
+            robot.outtake.setPivot(OUTTAKE_GRAB_BAR);
+            robot.outtake.ManualLevel(OUTTAKE_EXTEND_ASCENT_INTERMEDIARY, 0.8);
+
+            intakeState = IntakeState.ASCENT;
         }
     }
 
@@ -390,6 +398,35 @@ public class fsmDriveModeNew extends OpMode {
         }
     }
 
+    private void handleAscent() {
+        if (gamepad2.left_bumper) {
+            intakeState = IntakeState.INTAKE_START;
+            ascentStep = 0;
+            return;
+        }
+
+        if (gamepad2.dpad_up) {
+            if (ascentStep == 0) {
+                robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                outtakeTimer.reset();
+                ++ascentStep;
+            }
+
+            if (ascentStep == 1 && outtakeTimer.seconds() > 0.5) {
+                robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+                ++ascentStep;
+            }
+
+            if (ascentStep == 2 && outtakeTimer.seconds() > 1) {
+                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                robot.outtake.DisableServos();
+
+                ++ascentStep;
+            }
+
+        }
+    }
+
     private void updateFollower(double power) {
         double y = -gamepad1.left_stick_y; // Remember, this is reversed!
         double x = gamepad1.left_stick_x; // this is strafing
@@ -494,6 +531,9 @@ public class fsmDriveModeNew extends OpMode {
                 break;
             case OUTTAKE_SAMPLE:
                 handleOuttakeSample();
+                break;
+            case ASCENT:
+                handleAscent();
                 break;
             default:
                 intakeState = IntakeState.INTAKE_START;

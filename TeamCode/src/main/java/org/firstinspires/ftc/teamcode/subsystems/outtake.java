@@ -63,7 +63,17 @@ public class outtake {
         outtake.setPosition(position);
     }
 
+    public void DisableServos() {
+        pivotOut1.getController().pwmDisable();
+        pivotOut2.getController().pwmDisable();
+        outtake.getController().pwmDisable();
+    }
 
+    public void EnableServos() {
+        pivotOut1.getController().pwmEnable();
+        pivotOut2.getController().pwmEnable();
+        outtake.getController().pwmEnable();
+    }
 
 
 }

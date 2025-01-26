@@ -27,6 +27,10 @@ public class universalValues {
     public static double OUTTAKE_DUMP_BUCKET = 0.7;
     public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.36875;
     public static double OUTTAKE_COLLECT = 0.04;
+
+    // TODO: review actual position
+    public static double OUTTAKE_GRAB_BAR = 0.9;
+
     public static double OUTTAKE_OPEN = 0.708;
     public static double OUTTAKE_OPEN_BAR = 0.60;
     public static double OUTTAKE_CLOSE = 0.91;
@@ -47,6 +51,7 @@ public class universalValues {
     public static int OUTTAKE_EXTEND_MID = -1285;
     public static int OUTTAKE_EXTEND_SPECIMEN = -500;
     public static int OUTTAKE_EXTEND =  -1285;
+    public static int OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = -1000;
 
     public static int OUTTAKE_RETRACT = -50;
 
