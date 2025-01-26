@@ -26,8 +26,8 @@ public class BucketAutoNew extends OpMode {
     private PathChain scorePreload, grabFirstSample, scoreFirstSample, grabSecondSample, scoreSecondSample, pushThirdSample, park;
 
     // TODO: check actual offsets. These are GUESSED from ClipSpecimenOnBar
-    private final double OFFSET_X = 2.5;
-    private final double OFFSET_Y = -4.5;
+    private final double OFFSET_X = 0;
+    private final double OFFSET_Y = 0;
 
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 85.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose scorePose = new Pose(16.200 + OFFSET_X, 128.000 + OFFSET_Y, Math.toRadians(-45));
@@ -46,7 +46,7 @@ public class BucketAutoNew extends OpMode {
         STOP
     }
 
-    private PathState pathState = PathState.SCORE_PRELOAD;
+    private PathState pathState = PathState.START;
 
     private boolean intakeSliderManip = false;
 
@@ -56,7 +56,7 @@ public class BucketAutoNew extends OpMode {
                         new BezierLine( new Point(startPose), new Point(scorePose) )
                 )
                 .setLinearHeadingInterpolation(
-                        Math.toRadians(startPose.getHeading()), scorePose.getHeading()
+                        startPose.getHeading(), scorePose.getHeading()
                 )
                 .build();
         grabFirstSample = follower.pathBuilder()
@@ -138,6 +138,8 @@ public class BucketAutoNew extends OpMode {
     public void init() {
         robot = new robot(hardwareMap);
         follower = new Follower(hardwareMap);
+
+        changePathState(PathState.START);
         
         generatePaths();
 
@@ -152,7 +154,7 @@ public class BucketAutoNew extends OpMode {
         robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
         robot.intake.setPivot(universalValues.INTAKE_INIT);
         robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+        robot.intake.CloseIntake(universalValues.CLAW_OPEN);
 
         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
         robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
@@ -191,7 +193,7 @@ public class BucketAutoNew extends OpMode {
                 robot.intake.setPivot(universalValues.INTAKE_INT);
 
                 follower.followPath(scorePreload);
-                changePathState(PathState.SCORE_PRELOAD);
+                changePathState(PathState.STOP);
                 break;
 
             case SCORE_PRELOAD:

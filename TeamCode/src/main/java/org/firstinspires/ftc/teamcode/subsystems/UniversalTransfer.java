@@ -29,7 +29,6 @@ public class UniversalTransfer {
 
         if (transferStep == 0) {
             intake.setPivot(universalValues.INTAKE_INT);
-            intake.OpenIntake(universalValues.CLAW_LOOSE);
 
 //            intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
             intake.setClawPivot(universalValues.CLAW_VERTICAL);
@@ -40,10 +39,12 @@ public class UniversalTransfer {
             ++transferStep;
         }
         if (timer.getElapsedTimeSeconds() > 0.2) {
+            intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.6);
+
             if (transferStep == 1) {
-                intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.6);
                 intake.setPivot(0.92);
                 intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+                intake.OpenIntake(universalValues.CLAW_LOOSE);
 
                 ++transferStep;
             }

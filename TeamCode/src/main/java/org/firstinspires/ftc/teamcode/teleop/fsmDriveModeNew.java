@@ -41,7 +41,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
 import java.util.Arrays;
 import java.util.List;
@@ -63,6 +62,10 @@ public class fsmDriveModeNew extends OpMode {
 
     private boolean wallCollect = false;
 
+    private boolean intakeSliderManip = false;
+    private boolean outtakeSliderManip = false;
+    private boolean intakeFixSingleton = true;
+
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
     private DcMotorEx rightFront;
@@ -81,7 +84,8 @@ public class fsmDriveModeNew extends OpMode {
 
     private void initializeRobot() {
         robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-        robot.intake.CloseIntake(CLAW_CLOSE);
+
+        robot.intake.CloseIntake(CLAW_OPEN);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
@@ -89,9 +93,21 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void handleIntakeStart() {
+        telemetry.addData("OUTTAKE_EXTEND", OUTTAKE_EXTEND);
+        telemetry.addData("OUTTAKE_EXTEND_SPECIMEN", OUTTAKE_EXTEND_SPECIMEN);
+        telemetry.addData("OUTTAKE_RETRACT", OUTTAKE_RETRACT);
+
+        telemetry.addData("INTAKE_EXTEND", INTAKE_EXTEND);
+        telemetry.addData("INTAKE_RETRACT", INTAKE_RETRACT);
+
         robot.universalTransfer.resetTransfer();
-        robot.intake.ManualLevel(INTAKE_RETRACT, 0.5);
-        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+        if (!intakeSliderManip) {
+            telemetry.addData("RETRACTING INTAKE", "true");
+            robot.intake.ManualLevel(INTAKE_RETRACT, 0.5);
+        }
+        if (!outtakeSliderManip) {
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+        }
         isPressed = false;
         isSquare = false;
         isMoving = false;
@@ -118,9 +134,64 @@ public class fsmDriveModeNew extends OpMode {
             intakeState = IntakeState.OUTTAKE_SAMPLE;
         }
 
-        if (gamepad1.circle) {
+        if (gamepad1.circle && compactTimer.seconds() > 0.5) {
             compactTimer.reset();
             intakeState = IntakeState.INTAKE_PRE_COLLECT_COMPACT;
+        }
+
+        if (gamepad2.dpad_left) {
+            if (robot.intake.intakeLimit.isPressed()) {
+                INTAKE_RETRACT = robot.intake.intakeMotor.getCurrentPosition();
+                INTAKE_EXTEND = INTAKE_RETRACT + 290;
+                intakeSliderManip = false;
+                robot.intake.ManualLevel(INTAKE_RETRACT,0.8);
+                intakeFixSingleton = false;
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition());
+                telemetry.addData("pijdakl", robot.intake.intakeLimit.isPressed());
+            }
+
+            if (!intakeSliderManip && !robot.intake.intakeLimit.isPressed() && intakeFixSingleton) {
+                robot.intake.intakeMotor.setPower(-0.2);
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition() - 1000);
+                intakeSliderManip = true;
+            }
+        }
+
+        if (gamepad2.dpad_right) {
+            intakeFixSingleton = true;
+        }
+
+        if (gamepad2.dpad_up) {
+            if (!outtakeSliderManip) {
+                robot.outtake.outtakeMotor.setPower(0.8);
+                robot.outtake.outtakeMotor.setTargetPosition(robot.outtake.outtakeMotor.getCurrentPosition() - 5000);
+                outtakeSliderManip = true;
+            }
+        }
+
+        if (gamepad2.dpad_down) {
+            if (outtakeSliderManip) {
+                OUTTAKE_EXTEND = robot.outtake.outtakeMotor.getCurrentPosition();
+                OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_EXTEND + 785;
+                OUTTAKE_RETRACT = OUTTAKE_EXTEND + 1235;
+                outtakeSliderManip = false;
+
+
+                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+            }
+        }
+
+
+        // EMERGENCY PARK
+        if (gamepad2.left_trigger > 0.1) {
+            robot.outtake.setPivot(0.9);
+        }
+        if (gamepad2.right_trigger > 0.1) {
+            robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+        }
+
+        if (gamepad2.left_stick_y < 0) {
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
         }
     }
 
@@ -137,11 +208,11 @@ public class fsmDriveModeNew extends OpMode {
 
     private void adjustClawPivot() {
         if (gamepad1.dpad_right && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot < 1) {
-            clawPivot += 0.01;
+            clawPivot -= 0.01;
             robot.intake.setClawPivot(clawPivot);
             outtakeTimer.reset();
         } else if (gamepad1.dpad_left && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot > CLAW_VERTICAL) {
-            clawPivot -= 0.01;
+            clawPivot += 0.01;
             robot.intake.setClawPivot(clawPivot);
             outtakeTimer.reset();
         }
@@ -221,8 +292,8 @@ public class fsmDriveModeNew extends OpMode {
         adjustClawPosition();
 
         if (gamepad1.left_trigger > 0.1) {
-            robot.intake.setClawPivot(CLAW_HORIZONTAL);
-            clawPivot = CLAW_HORIZONTAL;
+            robot.intake.setClawPivot(0.6);
+            clawPivot = 0.6;
 
             robot.intake.setPivot(INTAKE_INT);
             intakeState = IntakeState.TRANSFER;
@@ -247,6 +318,7 @@ public class fsmDriveModeNew extends OpMode {
             robot.intake.setPivot(INTAKE_INT);
 
             intakeState = IntakeState.INTAKE_START;
+            compactTimer.reset();
         }
     }
 
@@ -345,6 +417,13 @@ public class fsmDriveModeNew extends OpMode {
         follower.startTeleopDrive();
         initializeRobot();
 
+        INTAKE_EXTEND = 290;
+        INTAKE_RETRACT = 0;
+        OUTTAKE_EXTEND = -1285;
+        OUTTAKE_EXTEND_SPECIMEN = -500;
+        OUTTAKE_RETRACT = -50;
+
+
         Constants.setConstants(FConstants.class, LConstants.class);
 
 
@@ -366,7 +445,7 @@ public class fsmDriveModeNew extends OpMode {
         }
 
         for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
     }

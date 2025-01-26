@@ -1,7 +1,16 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_VERTICAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
@@ -22,6 +31,9 @@ import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
@@ -29,6 +41,9 @@ import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
 import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 import org.firstinspires.ftc.teamcode.teleop.fsmDriveModeNew;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Autonomous(name = "Specimen Auto", group = "Autonomous")
 public class ClipSpecimenOnBar extends OpMode {
@@ -52,6 +67,12 @@ public class ClipSpecimenOnBar extends OpMode {
     private boolean isPressed = false;
     private int pathState;
 
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
+    private List<DcMotorEx> motors;
+
     // TODO: modify y offset to correct pedro path visualiser offset
 
     private final Pose startPose = new Pose(7,49, Math.toRadians(180));
@@ -60,10 +81,10 @@ public class ClipSpecimenOnBar extends OpMode {
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
-    private final Pose specimenPickup1 = new Pose(20.1, 27.6, Math.toRadians(180));
+    private final Pose specimenPickup1 = new Pose(20.1, 29, Math.toRadians(180));
     private final Pose barCliponPose2 = new Pose(37,72.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(35.75, 75.5, Math.toRadians(180));
-    private final Pose barCliponPose4 = new Pose(35.75, 78.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(37.2, 75.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(37, 78.5, Math.toRadians(180));
     private final Pose ParkPose = new Pose(2,32, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
     private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
@@ -258,7 +279,7 @@ public class ClipSpecimenOnBar extends OpMode {
                         stateTimer.resetTimer();
                         singleton = false;
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.5)
+                    if (stateTimer.getElapsedTimeSeconds() > 2.3)
                     {
                         singleton3 = false;
                         robot.intake.ManualLevel(INTAKE_RETRACT+130, 1);
@@ -266,11 +287,11 @@ public class ClipSpecimenOnBar extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 2.7)
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 3) {
+                        if (stateTimer.getElapsedTimeSeconds() > 2.9) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(universalValues.INTAKE_UP);
 
-                            if (stateTimer.getElapsedTimeSeconds() > 3.2) {
+                            if (stateTimer.getElapsedTimeSeconds() > 2) {
                                 follower.followPath(toBar2, true);
                                 setPathState(7);
                             }
@@ -321,13 +342,13 @@ public class ClipSpecimenOnBar extends OpMode {
                         singleton3 = false;
                         robot.intake.ManualLevel(INTAKE_RETRACT + 130, 1);
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 2.1) {
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7) {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                        if (stateTimer.getElapsedTimeSeconds() > 1.9) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(universalValues.INTAKE_UP);
 
-                            if (stateTimer.getElapsedTimeSeconds() > 2.4) {
+                            if (stateTimer.getElapsedTimeSeconds() > 2) {
                                 follower.followPath(toBar3, true);
                                 setPathState(9);
                             }
@@ -379,13 +400,13 @@ public class ClipSpecimenOnBar extends OpMode {
                         singleton3 = false;
                         robot.intake.ManualLevel(INTAKE_RETRACT + 130, 1);
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 2.1) {
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7) {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                        if (stateTimer.getElapsedTimeSeconds() > 1.9) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(universalValues.INTAKE_UP);
 
-                            if (stateTimer.getElapsedTimeSeconds() > 2.4) {
+                            if (stateTimer.getElapsedTimeSeconds() > 2) {
                                 follower.followPath(toBar4, true);
                                 setPathState(11);
                             }
@@ -410,11 +431,12 @@ public class ClipSpecimenOnBar extends OpMode {
                             if (stateTimer.getElapsedTimeSeconds() > 1) {
                                 robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                                 if (stateTimer.getElapsedTimeSeconds() > 1.15) {
-                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.7);
                                     robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
 //                                    follower.followPath(toSpecimenPickup3, true);
 
                                     robot.universalTransfer.resetTransfer();
+
                                     setPathState(-1);
                                 }
                             }
@@ -441,7 +463,7 @@ public class ClipSpecimenOnBar extends OpMode {
         follower.setStartingPose(startPose);
 
         robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-        robot.intake.CloseIntake(CLAW_CLOSE);
+        robot.intake.CloseIntake(CLAW_OPEN);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
@@ -449,6 +471,18 @@ public class ClipSpecimenOnBar extends OpMode {
 
         telemetry.update();
         buildPaths();
+
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
     }
 
     @Override
