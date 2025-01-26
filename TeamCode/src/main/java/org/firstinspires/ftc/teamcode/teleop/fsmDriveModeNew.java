@@ -198,6 +198,7 @@ public class fsmDriveModeNew extends OpMode {
     private void handleIntakeExtend() {
         if (abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 10) {
             robot.intake.setPivot(INTAKE_DOWN);
+            wallCollect = false;
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
             robot.intake.OpenIntake(CLAW_OPEN);
@@ -207,11 +208,11 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void adjustClawPivot() {
-        if (gamepad1.dpad_right && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot < 1) {
+        if (gamepad1.dpad_right && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot > CLAW_VERTICAL) {
             clawPivot -= 0.01;
             robot.intake.setClawPivot(clawPivot);
             outtakeTimer.reset();
-        } else if (gamepad1.dpad_left && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot > CLAW_VERTICAL) {
+        } else if (gamepad1.dpad_left && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot < 1) {
             clawPivot += 0.01;
             robot.intake.setClawPivot(clawPivot);
             outtakeTimer.reset();
@@ -253,10 +254,13 @@ public class fsmDriveModeNew extends OpMode {
         }
         if(gamepad1.cross){
             robot.intake.setPivot(INTAKE_DOWN);
+            robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+
             wallCollect = false;
         }
         if(gamepad1.square){
             robot.intake.setPivot(INTAKE_INT);
+            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
             wallCollect = true;
         }
         if (gamepad1.triangle) {

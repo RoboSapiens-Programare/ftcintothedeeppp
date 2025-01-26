@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class outtake {
     public Servo pivotOut1, pivotOut2, outtake;
 //    public DistanceSensor outtakeSensor;
-    public DcMotorEx outtakeMotor;
+    public DcMotorEx outtakeMotor, outtakeMotor2;
 
     public outtake(HardwareMap hardwareMap){
         pivotOut1 = hardwareMap.get(Servo.class, "pivotOut1");
@@ -17,13 +17,17 @@ public class outtake {
         outtake = hardwareMap.get(Servo.class, "outtake");
 
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
+        outtakeMotor2 = hardwareMap.get(DcMotorEx.class, "outtakeMotor2");
 
 //        outtakeSensor = hardwareMap.get(DistanceSensor.class, "outtakeSensor");
 
         pivotOut1.setDirection(Servo.Direction.FORWARD);
         pivotOut2.setDirection(Servo.Direction.REVERSE);
         outtakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtakeMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
     }
 
@@ -34,15 +38,20 @@ public class outtake {
 
     public void ManualLevel(int ManualTarget, double power) {
         outtakeMotor.setTargetPosition(ManualTarget);
+        outtakeMotor2.setTargetPosition(ManualTarget);
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        outtakeMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        if(outtakeMotor.getCurrentPosition() > ManualTarget)
+        if(outtakeMotor.getCurrentPosition() > ManualTarget && outtakeMotor2.getCurrentPosition() > ManualTarget)
         {
             outtakeMotor.setPower(power);
+            outtakeMotor2.setPower(power);
         }
         else
         {
             outtakeMotor.setPower(-power);
+            outtakeMotor2.setPower(-power);
+
         }
     }
 
