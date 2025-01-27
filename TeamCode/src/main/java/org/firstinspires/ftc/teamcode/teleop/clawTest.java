@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -25,7 +24,7 @@ public class clawTest extends OpMode {
 
     @Override
     public void loop() {
-        robot.intake.OpenIntake(universalValues.CLAW_CLOSE);
+        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
 
     }
 }

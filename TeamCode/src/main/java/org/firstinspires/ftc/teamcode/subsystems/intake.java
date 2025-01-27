@@ -24,8 +24,8 @@ public class intake {
 
         intakeLimit = hardwareMap.get(TouchSensor.class, "intakeLimit");
 
-        pivotin.setDirection(Servo.Direction.REVERSE);
-        pivotin2.setDirection(Servo.Direction.FORWARD);
+        pivotin.setDirection(Servo.Direction.FORWARD);
+        pivotin2.setDirection(Servo.Direction.REVERSE);
 
         intakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);

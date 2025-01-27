@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+
 import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
 import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
 import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
@@ -18,11 +19,13 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_I
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_TRANSFER;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_ASCENT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_ASCENT_INTERMEDIARY;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_GRAB;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_SPECIMEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_GRAB_BAR;
@@ -65,10 +68,11 @@ public class fsmDriveModeNew extends OpMode {
     private int ascentStep = 0;
 
     private boolean wallCollect = false;
-
+    private boolean doAscent = false;
     private boolean intakeSliderManip = false;
     private boolean outtakeSliderManip = false;
     private boolean intakeFixSingleton = true;
+    private boolean intakeMoveFixsingleton = true;
 
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
@@ -244,10 +248,24 @@ public class fsmDriveModeNew extends OpMode {
             if (wallCollect)
                 robot.intake.ManualLevel(INTAKE_EXTEND-50, 0.8);
             robot.intake.CloseIntake(CLAW_CLOSE);
-        } else if (gamepad1.right_bumper) {
+            intakeMoveFixsingleton = true;
+
+        } else if (gamepad1.right_bumper || !intakeMoveFixsingleton) {
+
+            intakeMoveFixsingleton = false;
             if (wallCollect)
                 robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
-            robot.intake.OpenIntake(CLAW_OPEN);
+
+            if (intakeTimer.seconds() > 0.4 && wallCollect) {
+                robot.intake.CloseIntake(CLAW_OPEN);
+                intakeMoveFixsingleton = true;
+            } else {
+                robot.intake.CloseIntake(CLAW_OPEN);
+                intakeMoveFixsingleton = true;
+            }
+
+        } else if (intakeMoveFixsingleton) {
+            intakeTimer.reset();
         }
 
         adjustClawPivot();
@@ -278,7 +296,7 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void handleIntakePreCompactCollect() {
-        robot.intake.ManualLevel(INTAKE_RETRACT+50, 0.8);
+        robot.intake.ManualLevel(INTAKE_RETRACT+60, 1);
         robot.intake.setPivot(INTAKE_INT);
         wallCollect = true;
 
@@ -291,12 +309,21 @@ public class fsmDriveModeNew extends OpMode {
 
     private void handleIntakeCompactCollect() {
         if (gamepad1.left_bumper) {
-            if (wallCollect)
-                robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
-            robot.intake.CloseIntake(CLAW_CLOSE);
+            if (intakeMoveFixsingleton) {
+                intakeTimer.reset();
+                intakeMoveFixsingleton = false;
+            }
+            if (wallCollect) {
+                robot.intake.ManualLevel(INTAKE_RETRACT + 27, 1);
+            }
+            if (intakeTimer.seconds() > 0.4) {
+                robot.intake.CloseIntake(CLAW_CLOSE);
+
+                intakeMoveFixsingleton = true;
+            }
         } else if (gamepad1.right_bumper) {
             if (wallCollect)
-                robot.intake.ManualLevel(INTAKE_RETRACT+50, 0.8);
+                robot.intake.ManualLevel(INTAKE_RETRACT+60, 1);
             robot.intake.OpenIntake(CLAW_OPEN);
         }
 
@@ -406,24 +433,31 @@ public class fsmDriveModeNew extends OpMode {
         }
 
         if (gamepad2.dpad_up) {
+            doAscent = true;
+        }
+
+        if (gamepad2.dpad_down) {
+            doAscent = false;
+        }
+
+        if (doAscent) {
             if (ascentStep == 0) {
-                robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                robot.outtake.ManualLevel(OUTTAKE_EXTEND_GRAB, 0.8);
                 outtakeTimer.reset();
                 ++ascentStep;
             }
 
-            if (ascentStep == 1 && outtakeTimer.seconds() > 0.5) {
+            if (ascentStep == 1 && outtakeTimer.seconds() > 1) {
                 robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
                 ++ascentStep;
             }
 
-            if (ascentStep == 2 && outtakeTimer.seconds() > 1) {
-                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+            if (ascentStep == 2 && outtakeTimer.seconds() > 1.35) {
+                robot.outtake.ManualLevel(OUTTAKE_ASCENT, 1);
                 robot.outtake.DisableServos();
 
                 ++ascentStep;
             }
-
         }
     }
 
@@ -457,12 +491,6 @@ public class fsmDriveModeNew extends OpMode {
         telemetry.update();
         follower.startTeleopDrive();
         initializeRobot();
-
-        INTAKE_EXTEND = 290;
-        INTAKE_RETRACT = 0;
-        OUTTAKE_EXTEND = -1285;
-        OUTTAKE_EXTEND_SPECIMEN = -500;
-        OUTTAKE_RETRACT = -50;
 
 
         Constants.setConstants(FConstants.class, LConstants.class);
