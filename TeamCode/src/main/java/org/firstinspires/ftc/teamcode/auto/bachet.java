@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_DOWN;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
@@ -189,56 +192,206 @@ public class bachet extends OpMode {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
-                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
                         follower.followPath(grabFirstSample, true);
-                        setPathState(-1);
+                        setPathState(2);
                     }
                 }
                 break;
             case 2:
                 if ((follower.getPose().getX() > grabFirstSamplePose.getX() - 1) &&
                         (follower.getPose().getY() < grabFirstSamplePose.getY() + 1)) {
-                    follower.followPath(scoreFirstSample, true);
-                    setPathState(3);
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
+
+                        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+                        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+                        robot.intake.OpenIntake(CLAW_OPEN);
+
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        robot.intake.setPivot(INTAKE_DOWN);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 1) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.8 && stateStep == 2) {
+                        follower.followPath(scoreFirstSample, true);
+                        setPathState(3);
+                    }
                 }
                 break;
             case 3:
+                robot.universalTransfer.transfer();
+
                 if ((follower.getPose().getX() < scorePose.getX() + 1) &&
                         (follower.getPose().getY() < scorePose.getY() + 1)) {
-                    follower.followPath(grabSecondSample, true);
-                    setPathState(4);
+
+                    if (!robot.universalTransfer.isTransferCompleted())
+                        break;
+
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
+                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                        ++stateStep;
+                    }
+                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                        follower.followPath(grabSecondSample, true);
+                        robot.universalTransfer.resetTransfer();
+                        setPathState(4);
+                    }
                 }
                 break;
             case 4:
                 if ((follower.getPose().getX() > grabSecodSamplePose.getX() - 1) &&
                         (follower.getPose().getY() < grabSecodSamplePose.getY() + 1)) {
-                    follower.followPath(scoreSecondSample, true);
-                    setPathState(5);
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
+
+                        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+                        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+                        robot.intake.OpenIntake(CLAW_OPEN);
+
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        robot.intake.setPivot(INTAKE_DOWN);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 1) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.8 && stateStep == 2) {
+                        follower.followPath(scoreSecondSample, true);
+                        setPathState(5);
+                    }
                 }
                 break;
 
             case 5:
+                robot.universalTransfer.transfer();
+
                 if ((follower.getPose().getX() < scorePose.getX() + 1) &&
                         (follower.getPose().getY() > scorePose.getY() - 1)) {
-                    follower.followPath(grabThirdSample, true);
-                    setPathState(6);
+                    if (!robot.universalTransfer.isTransferCompleted())
+                        break;
+
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
+                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                        ++stateStep;
+                    }
+                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                        follower.followPath(grabThirdSample, true);
+                        robot.universalTransfer.resetTransfer();
+                        setPathState(6);
+                    }
+
                 }
                 break;
             case 6:
                 if ((follower.getPose().getX() > grabThirdSamplePose.getX() - 1) &&
                         (follower.getPose().getY() > grabThirdSamplePose.getY() - 1)) {
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
 
-                    follower.followPath(scoreThirdSample, true);
-                    setPathState(7);
+                        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+                        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+                        robot.intake.OpenIntake(CLAW_OPEN);
+
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        robot.intake.setPivot(INTAKE_DOWN);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 1) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.8 && stateStep == 2) {
+                        follower.followPath(scoreThirdSample, true);
+                        setPathState(7);
+                    }
                 }
                 break;
 
             case (7):
+                robot.universalTransfer.transfer();
+
                 if ((follower.getPose().getX() > scorePose.getX() - 1) &&
                         (follower.getPose().getY() < scorePose.getY() + 1)) {
+                    if (!robot.universalTransfer.isTransferCompleted())
+                        break;
 
-                    follower.followPath(park, true);
-                    setPathState(8);
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
+                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                        ++stateStep;
+                    }
+                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                        follower.followPath(park, true);
+                        robot.universalTransfer.resetTransfer();
+                        setPathState(8);
+                    }
                 }
                 break;
 
