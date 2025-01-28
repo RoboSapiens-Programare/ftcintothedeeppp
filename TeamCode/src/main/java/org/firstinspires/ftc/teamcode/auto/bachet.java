@@ -1,0 +1,328 @@
+package org.firstinspires.ftc.teamcode.auto;
+
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Constants;
+import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.teamcode.constants.FConstants;
+import org.firstinspires.ftc.teamcode.constants.LConstants;
+import org.firstinspires.ftc.teamcode.subsystems.robot;
+
+import java.util.List;
+
+@Autonomous(name = "0+4", group = "Autonomous")
+public class bachet extends OpMode {
+
+    private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
+    private Follower follower;
+    private Timer stateTimer, pathTimer, transferTimer, poseTimer;
+    private boolean singleton = true;
+    private boolean timerResetSingleton = true;
+
+    private int stateStep = 0;
+
+    private int pathState;
+
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
+    private List<DcMotorEx> motors;
+
+    // TODO: modify y offset to correct pedro path visualiser offset
+
+    private final double OFFSET_X = 2.5;
+    private final double OFFSET_Y = -4;
+
+    private final Pose startPose = new Pose(9.750 + OFFSET_X, 85.000 + OFFSET_Y, Math.toRadians(-90));
+    private final Pose scorePose = new Pose(15.800 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(-45));
+    private final Pose grabFirstSamplePose = new Pose(24.000 + OFFSET_X, 128.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabSecodSamplePose = new Pose(24.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabThirdSamplePose = new Pose(24.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(35));
+    private final Pose parkPose = new Pose(62.000 + OFFSET_X, 97.000 + OFFSET_Y, Math.toRadians(-90));
+
+
+    private PathChain scorePreload, grabFirstSample, scoreFirstSample, grabSecondSample, scoreSecondSample, grabThirdSample, scoreThirdSample, park;
+
+    public void buildPaths() {
+        // TODO : fix Linear Heading Interpolation for rotation to the right without hard coding value bigger than 180 (line 37)
+        scorePreload = follower.pathBuilder()
+                .addPath(
+                        new BezierLine( new Point(startPose), new Point(scorePose) )
+                )
+                .setLinearHeadingInterpolation(
+                        startPose.getHeading(), scorePose.getHeading()
+                )
+                .build();
+        grabFirstSample = follower.pathBuilder()
+                .addPath(
+                        new BezierLine( new Point(scorePose), new Point(grabFirstSamplePose) )
+                )
+                .setLinearHeadingInterpolation(
+                        scorePose.getHeading(),
+                        grabFirstSamplePose.getHeading()
+                )
+                .build();
+        scoreFirstSample = follower.pathBuilder()
+                .addPath(
+                        new BezierLine( new Point(grabFirstSamplePose), new Point(scorePose) )
+                )
+                .setLinearHeadingInterpolation(
+                        grabFirstSamplePose.getHeading(),
+                        scorePose.getHeading()
+                )
+                .build();
+        grabSecondSample = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(scorePose),
+                                new Point(grabSecodSamplePose)
+                        )
+                )
+                .setLinearHeadingInterpolation(
+                        scorePose.getHeading(),
+                        grabSecodSamplePose.getHeading()
+                )
+                .build();
+        scoreSecondSample = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(grabSecodSamplePose),
+                                new Point(scorePose)
+                        )
+                )
+                .setLinearHeadingInterpolation(
+                        grabSecodSamplePose.getHeading(),
+                        scorePose.getHeading()
+                )
+                .build();
+        grabThirdSample = follower.pathBuilder()
+                .addPath(
+                        new BezierLine( new Point(scorePose), new Point(grabThirdSamplePose) )
+                )
+                .setLinearHeadingInterpolation(
+                        scorePose.getHeading(),
+                        grabThirdSamplePose.getHeading()
+                )
+                .build();
+        scoreThirdSample = follower.pathBuilder()
+                .addPath(
+                        new BezierLine( new Point(grabThirdSamplePose), new Point(scorePose) )
+                )
+                .setLinearHeadingInterpolation(
+                        grabThirdSamplePose.getHeading(),
+                        scorePose.getHeading()
+                )
+                .build();
+        park = follower.pathBuilder()
+                .addPath(
+                        // Line 8
+                        new BezierCurve(
+                                new Point(scorePose),
+                                new Point(60.000 + OFFSET_X, 128.000 + OFFSET_Y, Point.CARTESIAN),
+                                new Point(parkPose)
+                        )
+                )
+                .setConstantHeadingInterpolation(parkPose.getHeading())
+                .build();
+    }
+
+    public void setPathState(int pState) {
+        pathState = pState;
+
+        robot.universalTransfer.resetTransfer();
+        pathTimer.resetTimer();
+        stateTimer.resetTimer();
+        transferTimer.resetTimer();
+        singleton = true;
+        timerResetSingleton = true;
+
+        stateStep = 0;
+    }
+
+    public void autonomousUpdate() {
+        switch(pathState) {
+            case 0:
+                follower.followPath(scorePreload,true);
+
+                setPathState(1);
+                break;
+            case 1:
+                if ((follower.getPose().getX() > scorePose.getX() - 1) &&
+                        (follower.getPose().getY() > scorePose.getY() - 1)) {
+                    if (timerResetSingleton) {
+                        poseTimer.resetTimer();
+                        timerResetSingleton = false;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
+                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                        ++stateStep;
+                    }
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 3) {
+                        follower.followPath(grabFirstSample, true);
+                        setPathState(-1);
+                    }
+                }
+                break;
+            case 2:
+                if ((follower.getPose().getX() > grabFirstSamplePose.getX() - 1) &&
+                        (follower.getPose().getY() < grabFirstSamplePose.getY() + 1)) {
+                    follower.followPath(scoreFirstSample, true);
+                    setPathState(3);
+                }
+                break;
+            case 3:
+                if ((follower.getPose().getX() < scorePose.getX() + 1) &&
+                        (follower.getPose().getY() < scorePose.getY() + 1)) {
+                    follower.followPath(grabSecondSample, true);
+                    setPathState(4);
+                }
+                break;
+            case 4:
+                if ((follower.getPose().getX() > grabSecodSamplePose.getX() - 1) &&
+                        (follower.getPose().getY() < grabSecodSamplePose.getY() + 1)) {
+                    follower.followPath(scoreSecondSample, true);
+                    setPathState(5);
+                }
+                break;
+
+            case 5:
+                if ((follower.getPose().getX() < scorePose.getX() + 1) &&
+                        (follower.getPose().getY() > scorePose.getY() - 1)) {
+                    follower.followPath(grabThirdSample, true);
+                    setPathState(6);
+                }
+                break;
+            case 6:
+                if ((follower.getPose().getX() > grabThirdSamplePose.getX() - 1) &&
+                        (follower.getPose().getY() > grabThirdSamplePose.getY() - 1)) {
+
+                    follower.followPath(scoreThirdSample, true);
+                    setPathState(7);
+                }
+                break;
+
+            case (7):
+                if ((follower.getPose().getX() > scorePose.getX() - 1) &&
+                        (follower.getPose().getY() < scorePose.getY() + 1)) {
+
+                    follower.followPath(park, true);
+                    setPathState(8);
+                }
+                break;
+
+
+            case 8:
+                if ((follower.getPose().getX() > parkPose.getX() - 1) &&
+                        (follower.getPose().getY() < parkPose.getY() + 1)) {
+                    setPathState(-1);
+                }
+                break;
+        }
+    }
+
+
+    @Override
+    public void init() {
+
+        Constants.setConstants(FConstants.class, LConstants.class);
+
+        robot = new robot(hardwareMap);
+        follower = new Follower(hardwareMap);
+
+        stateTimer = new Timer();
+        pathTimer = new Timer();
+        transferTimer = new Timer();
+        poseTimer = new Timer();
+
+        follower.setStartingPose(startPose);
+
+        robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+        robot.intake.CloseIntake(CLAW_OPEN);
+        robot.intake.setClawPivot(CLAW_HORIZONTAL);
+        robot.intake.setPivot(INTAKE_INIT);
+        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+        robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
+
+        telemetry.update();
+        buildPaths();
+
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+    }
+
+    @Override
+    public void loop() {
+
+        follower.update();
+        if (singleton) {
+            robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+        }
+        autonomousUpdate();
+
+        telemetry.addData("path state", pathState);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.update();
+
+    }
+
+    @Override
+    public void init_loop() {
+        stateTimer.resetTimer();
+        transferTimer.resetTimer();
+
+        robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+    }
+
+    @Override
+    public void start() {
+        setPathState(0);
+    }
+
+    @Override
+    public void stop() {
+    }
+}

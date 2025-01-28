@@ -30,9 +30,9 @@ public class universalValues {
     // TODO: review actual position
     public static double OUTTAKE_GRAB_BAR = 1;
 
-    public static double OUTTAKE_OPEN = 1;
+    public static double OUTTAKE_OPEN = 0.85;
     public static double OUTTAKE_OPEN_BAR = 0.60;
-    public static double OUTTAKE_CLOSE = 0.8;
+    public static double OUTTAKE_CLOSE = 0.6;
 
     // outtake values for clipping on specimen
 

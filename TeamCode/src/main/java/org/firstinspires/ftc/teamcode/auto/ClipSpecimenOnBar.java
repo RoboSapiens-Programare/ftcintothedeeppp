@@ -1,19 +1,9 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
-import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
-import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
-import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
-import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_VERTICAL;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
@@ -33,16 +23,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
 import org.firstinspires.ftc.teamcode.subsystems.universalValues;
-import org.firstinspires.ftc.teamcode.teleop.fsmDriveModeNew;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Autonomous(name = "Specimen Auto", group = "Autonomous")
@@ -76,15 +62,15 @@ public class ClipSpecimenOnBar extends OpMode {
     // TODO: modify y offset to correct pedro path visualiser offset
 
     private final Pose startPose = new Pose(7,49, Math.toRadians(180));
-    private final Pose barCliponPose1 = new Pose(32.75,65, Math.toRadians(180));
     private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
     private final Pose specimenPickup1 = new Pose(20.1, 29, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(37,72.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(37.2, 75.5, Math.toRadians(180));
-    private final Pose barCliponPose4 = new Pose(37, 78.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(32.75,65, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(35,72.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(35, 75.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(35, 78.5, Math.toRadians(180));
     private final Pose ParkPose = new Pose(2,32, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
     private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
@@ -282,7 +268,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 2.3)
                     {
                         singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT+130, 1);
+                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 2.7)
                     {
@@ -340,7 +326,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 1.3) {
                         singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT + 130, 1);
+                        robot.intake.ManualLevel(INTAKE_RETRACT + 150, 1);
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 1.7) {
                         robot.intake.OpenIntake(CLAW_CLOSE);
@@ -398,7 +384,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 1.3) {
                         singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT + 130, 1);
+                        robot.intake.ManualLevel(INTAKE_RETRACT + 150, 1);
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 1.7) {
                         robot.intake.OpenIntake(CLAW_CLOSE);

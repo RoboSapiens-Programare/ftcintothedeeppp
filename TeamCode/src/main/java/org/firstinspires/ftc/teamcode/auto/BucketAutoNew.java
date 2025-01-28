@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -26,11 +28,11 @@ public class BucketAutoNew extends OpMode {
     private PathChain scorePreload, grabFirstSample, scoreFirstSample, grabSecondSample, scoreSecondSample, pushThirdSample, park;
 
     // TODO: check actual offsets. These are GUESSED from ClipSpecimenOnBar
-    private final double OFFSET_X = 0;
-    private final double OFFSET_Y = 0;
+    private final double OFFSET_X = 2.5;
+    private final double OFFSET_Y = -4;
 
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 85.000 + OFFSET_Y, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(16.200 + OFFSET_X, 128.000 + OFFSET_Y, Math.toRadians(-45));
+    private final Pose scorePose = new Pose(15.800 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(-45));
     private final Pose scorePushPose = new Pose(14.000 + OFFSET_X, 135.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose grabFirstSamplePose = new Pose(24.000 + OFFSET_X, 131.500 + OFFSET_Y, Math.toRadians(0));
     private final Pose grabSecodSamplePose = new Pose(24.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(0));
@@ -147,8 +149,8 @@ public class BucketAutoNew extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
 
         actionTimer = new Timer();
-        
 
+        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.update();
 
         robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
@@ -190,9 +192,11 @@ public class BucketAutoNew extends OpMode {
     private void autoPathUpdate() {
         switch (pathState) {
             case START:
-                robot.intake.setPivot(universalValues.INTAKE_INT);
+//                robot.intake.setPivot(universalValues.INTAKE_INT);
+//                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
+//                robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
 
-                follower.followPath(scorePreload);
+                follower.followPath(scorePreload, true);
                 changePathState(PathState.STOP);
                 break;
 
@@ -216,7 +220,7 @@ public class BucketAutoNew extends OpMode {
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
                         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
-                        follower.followPath(grabFirstSample);
+                        follower.followPath(grabFirstSample, true);
                         changePathState(PathState.GRAB_FIRST);
                     }
                 }
@@ -245,7 +249,7 @@ public class BucketAutoNew extends OpMode {
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
                         robot.intake.setPivot(universalValues.INTAKE_INT);
 
-                        follower.followPath(scoreFirstSample);
+                        follower.followPath(scoreFirstSample, true);
                         changePathState(PathState.SCORE_FIRST);
                     }
                 }
@@ -278,7 +282,7 @@ public class BucketAutoNew extends OpMode {
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
                         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
-                        follower.followPath(grabSecondSample);
+                        follower.followPath(grabSecondSample, true);
                         robot.universalTransfer.resetTransfer();
                         changePathState(PathState.GRAB_SECOND);
                     }
@@ -308,7 +312,7 @@ public class BucketAutoNew extends OpMode {
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
                         robot.intake.setPivot(universalValues.INTAKE_INT);
 
-                        follower.followPath(scoreSecondSample);
+                        follower.followPath(scoreSecondSample, true);
                         changePathState(PathState.SCORE_SECOND);
                     }
                 }
@@ -342,7 +346,7 @@ public class BucketAutoNew extends OpMode {
                         robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
                         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
-                        follower.followPath(pushThirdSample);
+                        follower.followPath(pushThirdSample, true);
                         robot.universalTransfer.resetTransfer();
                         changePathState(PathState.PUSH_THIRD);
                     }
