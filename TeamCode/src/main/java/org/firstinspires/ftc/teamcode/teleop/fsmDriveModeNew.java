@@ -418,7 +418,7 @@ public class fsmDriveModeNew extends OpMode {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
             if (outtakeTimer.seconds()>0.6)
             {
-                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
                 robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
                 intakeState=IntakeState.INTAKE_START;
             }

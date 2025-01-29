@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPE
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_DOWN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
@@ -14,6 +15,8 @@ import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -39,7 +42,7 @@ public class bachet extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
     private Follower follower;
     private Timer stateTimer, pathTimer, transferTimer, poseTimer;
-    private boolean singleton = true;
+    private boolean sliderManip = true;
     private boolean timerResetSingleton = true;
 
     private int stateStep = 0;
@@ -58,10 +61,10 @@ public class bachet extends OpMode {
     private final double OFFSET_Y = -4;
 
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 85.000 + OFFSET_Y, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(15.800 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(-45));
-    private final Pose grabFirstSamplePose = new Pose(24.000 + OFFSET_X, 128.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(24.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabThirdSamplePose = new Pose(24.000 + OFFSET_X, 121.500 + OFFSET_Y, Math.toRadians(35));
+    private final Pose scorePose = new Pose(15.500 + OFFSET_X, 128.500 + OFFSET_Y, Math.toRadians(-45));
+    private final Pose grabFirstSamplePose = new Pose(30.000 + OFFSET_X, 129.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabSecodSamplePose = new Pose(30.000 + OFFSET_X, 118.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabThirdSamplePose = new Pose(35.000 + OFFSET_X, 129.500 + OFFSET_Y, Math.toRadians(35));
     private final Pose parkPose = new Pose(62.000 + OFFSET_X, 97.000 + OFFSET_Y, Math.toRadians(-90));
 
 
@@ -157,7 +160,7 @@ public class bachet extends OpMode {
         pathTimer.resetTimer();
         stateTimer.resetTimer();
         transferTimer.resetTimer();
-        singleton = true;
+        sliderManip = true;
         timerResetSingleton = true;
 
         stateStep = 0;
@@ -179,7 +182,7 @@ public class bachet extends OpMode {
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
-                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 1);
                         ++stateStep;
                     }
 
@@ -213,6 +216,7 @@ public class bachet extends OpMode {
 
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        sliderManip = false;
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
@@ -223,40 +227,38 @@ public class bachet extends OpMode {
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 1.8 && stateStep == 2) {
-                        follower.followPath(scoreFirstSample, true);
-                        setPathState(3);
+                        robot.universalTransfer.transfer();
+                        if (robot.universalTransfer.isTransferCompleted()) {
+                            robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+
+                            follower.followPath(scoreFirstSample, true);
+                            setPathState(3);
+                        }
+
                     }
                 }
                 break;
             case 3:
-                robot.universalTransfer.transfer();
-
                 if ((follower.getPose().getX() < scorePose.getX() + 1) &&
                         (follower.getPose().getY() < scorePose.getY() + 1)) {
 
-                    if (!robot.universalTransfer.isTransferCompleted())
-                        break;
 
                     if (timerResetSingleton) {
                         poseTimer.resetTimer();
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
-                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
-                        ++stateStep;
-                    }
-
-                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
-                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                        robot.intake.setPivot(INTAKE_INT);
                         follower.followPath(grabSecondSample, true);
                         robot.universalTransfer.resetTransfer();
                         setPathState(4);
@@ -266,6 +268,7 @@ public class bachet extends OpMode {
             case 4:
                 if ((follower.getPose().getX() > grabSecodSamplePose.getX() - 1) &&
                         (follower.getPose().getY() < grabSecodSamplePose.getY() + 1)) {
+
                     if (timerResetSingleton) {
                         poseTimer.resetTimer();
 
@@ -278,6 +281,7 @@ public class bachet extends OpMode {
 
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        sliderManip = false;
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
@@ -288,40 +292,37 @@ public class bachet extends OpMode {
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 1.8 && stateStep == 2) {
-                        follower.followPath(scoreSecondSample, true);
-                        setPathState(5);
+                        robot.universalTransfer.transfer();
+                        if (robot.universalTransfer.isTransferCompleted()) {
+                            robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
+
+                            follower.followPath(scoreSecondSample, true);
+                            setPathState(5);
+                        }
                     }
                 }
                 break;
 
             case 5:
-                robot.universalTransfer.transfer();
-
                 if ((follower.getPose().getX() < scorePose.getX() + 1) &&
                         (follower.getPose().getY() > scorePose.getY() - 1)) {
-                    if (!robot.universalTransfer.isTransferCompleted())
-                        break;
 
                     if (timerResetSingleton) {
                         poseTimer.resetTimer();
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
-                        robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
-                        ++stateStep;
-                    }
-
-                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
-                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                        robot.intake.setPivot(INTAKE_INT);
                         follower.followPath(grabThirdSample, true);
                         robot.universalTransfer.resetTransfer();
                         setPathState(6);
@@ -339,11 +340,14 @@ public class bachet extends OpMode {
                         robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
                         robot.intake.OpenIntake(CLAW_OPEN);
 
+                        robot.intake.setClawPivot(0.56);
+
                         timerResetSingleton = false;
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        sliderManip = false;
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
@@ -354,19 +358,20 @@ public class bachet extends OpMode {
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 1.8 && stateStep == 2) {
-                        follower.followPath(scoreThirdSample, true);
-                        setPathState(7);
+                        robot.universalTransfer.transfer();
+
+                        if (robot.universalTransfer.isTransferCompleted()) {
+                            follower.followPath(scoreThirdSample, true);
+                            setPathState(7);
+                        }
                     }
                 }
                 break;
 
             case (7):
-                robot.universalTransfer.transfer();
 
                 if ((follower.getPose().getX() > scorePose.getX() - 1) &&
                         (follower.getPose().getY() < scorePose.getY() + 1)) {
-                    if (!robot.universalTransfer.isTransferCompleted())
-                        break;
 
                     if (timerResetSingleton) {
                         poseTimer.resetTimer();
@@ -388,6 +393,7 @@ public class bachet extends OpMode {
                         ++stateStep;
                     }
                     if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                        robot.intake.setPivot(INTAKE_INT);
                         follower.followPath(park, true);
                         robot.universalTransfer.resetTransfer();
                         setPathState(8);
@@ -428,6 +434,8 @@ public class bachet extends OpMode {
         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
         robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
 
+        telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
         telemetry.update();
         buildPaths();
 
@@ -448,7 +456,7 @@ public class bachet extends OpMode {
     public void loop() {
 
         follower.update();
-        if (singleton) {
+        if (sliderManip) {
             robot.intake.ManualLevel(INTAKE_RETRACT, 1);
         }
         autonomousUpdate();
