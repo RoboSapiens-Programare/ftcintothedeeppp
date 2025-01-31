@@ -6,18 +6,17 @@ import com.acmerobotics.dashboard.config.Config;
 public class universalValues {
 
     public static double INTAKE_UP = 0.73;
-    public static double INTAKE_DOWN = 0.19;
-    public static double INTAKE_INT = 0.45;
-    public static double INTAKE_INIT = 0.74;
+    public static double INTAKE_DOWN = 0.14;
+    public static double INTAKE_INT = 0.5;
+    public static double INTAKE_INIT = 0.84;
 
     // PIVOT position for when the sample is to be transferred
     // TODO: check actual value for *_LOOSE and INTAKE_TRANSFER
-    public static double INTAKE_TRANSFER = 0.82;
+    public static double INTAKE_TRANSFER = 0.93;
 
-
-    public static double CLAW_LOOSE = 0.43;
-    public static double CLAW_OPEN = 0.6;
-    public static double CLAW_CLOSE = 0.3;
+    public static double CLAW_CLOSE = 0.435;
+    public static double CLAW_LOOSE = 0.462;
+    public static double CLAW_OPEN = 0.7;
 
     public static double CLAW_VERTICAL = 0.4;
     public static double CLAW_HORIZONTAL = 0.72;
@@ -30,9 +29,9 @@ public class universalValues {
     // TODO: review actual position
     public static double OUTTAKE_GRAB_BAR = 1;
 
-    public static double OUTTAKE_OPEN = 0.85;
+    public static double OUTTAKE_OPEN = 0.55;
     public static double OUTTAKE_OPEN_BAR = 0.60;
-    public static double OUTTAKE_CLOSE = 0.6;
+    public static double OUTTAKE_CLOSE = 0.38;
 
     // outtake values for clipping on specimen
 
@@ -47,14 +46,14 @@ public class universalValues {
 
     public static int INTAKE_EXTEND = 290;
 
-    public static int OUTTAKE_EXTEND_MID = -1754;
+    public static int OUTTAKE_EXTEND_MID = -1770;
     public static int OUTTAKE_EXTEND_GRAB = -1584;
     public static int OUTTAKE_ASCENT = -754;
     public static int OUTTAKE_EXTEND_SPECIMEN = -500;
-    public static int OUTTAKE_EXTEND =  -1754;
+    public static int OUTTAKE_EXTEND =  -1770;
     public static int OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = -1000;
 
-    public static int OUTTAKE_RETRACT = 0;
+    public static int OUTTAKE_RETRACT = -50;
 
     public static int INTAKE_RETRACT = 0;
 }

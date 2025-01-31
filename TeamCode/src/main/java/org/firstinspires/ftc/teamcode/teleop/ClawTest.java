@@ -18,7 +18,7 @@ public class ClawTest extends OpMode {
     public void init() {
         robot = new robot(hardwareMap);
 
-        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND,1);
+        robot.intake.ManualLevel(universalValues.INTAKE_RETRACT,1);
         robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
         robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
         robot.intake.setPivot(universalValues.INTAKE_INT);
@@ -28,6 +28,7 @@ public class ClawTest extends OpMode {
 
     @Override
     public void loop() {
+        /*
         if (step == 0) {
             robot.intake.setPivot(universalValues.INTAKE_UP);
             ++step;
@@ -40,5 +41,8 @@ public class ClawTest extends OpMode {
             timer.resetTimer();
             step = 0;
         }
+        */
+
+        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
     }
 }

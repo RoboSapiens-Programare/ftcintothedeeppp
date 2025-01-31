@@ -73,6 +73,7 @@ public class fsmDriveModeNew extends OpMode {
     private boolean outtakeSliderManip = false;
     private boolean intakeFixSingleton = true;
     private boolean intakeMoveFixsingleton = true;
+    private boolean fixExtensionSingleton = true;
 
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
@@ -82,7 +83,6 @@ public class fsmDriveModeNew extends OpMode {
 
     private enum IntakeState {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION,
-        INTAKE_PRE_COLLECT_COMPACT, INTAKE_COLLECT_COMPACT,
         INTAKE_EXTEND, OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE,
         TRANSFER, ASCENT
     }
@@ -92,7 +92,7 @@ public class fsmDriveModeNew extends OpMode {
 
     private void initializeRobot() {
         robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-
+        robot.outtake.ManualLevel(0, 1);
         robot.intake.CloseIntake(CLAW_OPEN);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
@@ -121,30 +121,22 @@ public class fsmDriveModeNew extends OpMode {
         isMoving = false;
         if (isStarted) {
             robot.intake.setPivot(INTAKE_INT);
+            robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
             isStarted = false;
         }
         if (gamepad1.right_trigger > 0.1) {
             robot.intake.ManualLevel(INTAKE_EXTEND, 0.75);
             intakeState = IntakeState.INTAKE_EXTEND;
         }
-        if (intakeTimer.seconds() > 0.2) {
-            robot.intake.setPivot(INTAKE_INT);
-            robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
-        }
         if (gamepad2.triangle) {
             robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 0.75);
             outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_MID;
         }
-        if (gamepad1.square) {
+        if (gamepad1.circle) {
             intakeTimer.reset();
             outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_SAMPLE;
-        }
-
-        if (gamepad1.circle && compactTimer.seconds() > 0.5) {
-            compactTimer.reset();
-            intakeState = IntakeState.INTAKE_PRE_COLLECT_COMPACT;
         }
 
         if (gamepad2.dpad_left) {
@@ -205,6 +197,38 @@ public class fsmDriveModeNew extends OpMode {
 
             intakeState = IntakeState.ASCENT;
         }
+
+
+        // compact collect
+        if (gamepad1.left_bumper) {
+            robot.intake.CloseIntake(CLAW_CLOSE);
+        } else if (gamepad1.right_bumper) {
+            robot.intake.OpenIntake(CLAW_OPEN);
+        }
+
+        adjustClawPivot();
+        adjustClawPosition();
+
+        if (gamepad1.left_trigger > 0.1) {
+            robot.intake.setClawPivot(0.6);
+            clawPivot = 0.6;
+
+            robot.intake.setPivot(INTAKE_INT);
+            intakeState = IntakeState.TRANSFER;
+        }
+
+        if(gamepad1.cross){
+            robot.intake.setPivot(INTAKE_DOWN);
+            wallCollect = false;
+        }
+        if(gamepad1.square){
+            robot.intake.setPivot(INTAKE_INT);
+            wallCollect = true;
+        }
+        if (gamepad1.triangle) {
+            robot.intake.setPivot(INTAKE_TRANSFER);
+            wallCollect = false;
+        }
     }
 
     private void handleIntakeExtend() {
@@ -244,6 +268,8 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void handleIntakeClawCollectPosition() {
+        telemetry.addData("fixExtensionSingleton", fixExtensionSingleton);
+        telemetry.addData("intakeTimer", intakeTimer.seconds());
         if (gamepad1.left_bumper) {
             if (wallCollect)
                 robot.intake.ManualLevel(INTAKE_EXTEND-50, 0.8);
@@ -264,7 +290,7 @@ public class fsmDriveModeNew extends OpMode {
                 intakeMoveFixsingleton = true;
             }
 
-        } else if (intakeMoveFixsingleton) {
+        } else if (intakeMoveFixsingleton && fixExtensionSingleton) {
             intakeTimer.reset();
         }
 
@@ -278,86 +304,28 @@ public class fsmDriveModeNew extends OpMode {
             robot.intake.setPivot(INTAKE_INT);
             intakeState = IntakeState.TRANSFER;
         }
-        if(gamepad1.cross){
-            robot.intake.setPivot(INTAKE_DOWN);
-            robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
-
-            wallCollect = false;
-        }
-        if(gamepad1.square){
-            robot.intake.setPivot(INTAKE_INT);
-            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
-            wallCollect = true;
-        }
-        if (gamepad1.triangle) {
-            robot.intake.setPivot(INTAKE_TRANSFER);
-            wallCollect = false;
-        }
-    }
-
-    private void handleIntakePreCompactCollect() {
-        robot.intake.ManualLevel(INTAKE_RETRACT+60, 1);
-        robot.intake.setPivot(INTAKE_INT);
-        wallCollect = true;
-
-        robot.intake.OpenIntake(CLAW_OPEN);
-        robot.intake.setClawPivot(CLAW_HORIZONTAL);
-        clawPivot = CLAW_HORIZONTAL;
-
-        intakeState = IntakeState.INTAKE_COLLECT_COMPACT;
-    }
-
-    private void handleIntakeCompactCollect() {
-        if (gamepad1.left_bumper) {
-            if (intakeMoveFixsingleton) {
+        if(gamepad1.cross || !fixExtensionSingleton){
+            if (fixExtensionSingleton) {
+                robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                 intakeTimer.reset();
-                intakeMoveFixsingleton = false;
+                fixExtensionSingleton = false;
             }
-            if (wallCollect) {
-                robot.intake.ManualLevel(INTAKE_RETRACT + 27, 1);
+
+            if (intakeTimer.seconds() > 0.25) {
+                robot.intake.setPivot(INTAKE_DOWN);
+                fixExtensionSingleton = true;
             }
-            if (intakeTimer.seconds() > 0.4) {
-                robot.intake.CloseIntake(CLAW_CLOSE);
 
-                intakeMoveFixsingleton = true;
-            }
-        } else if (gamepad1.right_bumper) {
-            if (wallCollect)
-                robot.intake.ManualLevel(INTAKE_RETRACT+60, 1);
-            robot.intake.OpenIntake(CLAW_OPEN);
-        }
-
-        adjustClawPivot();
-        adjustClawPosition();
-
-        if (gamepad1.left_trigger > 0.1) {
-            robot.intake.setClawPivot(0.6);
-            clawPivot = 0.6;
-
-            robot.intake.setPivot(INTAKE_INT);
-            intakeState = IntakeState.TRANSFER;
-        }
-
-        if(gamepad1.cross){
-            robot.intake.setPivot(INTAKE_DOWN);
             wallCollect = false;
         }
         if(gamepad1.square){
             robot.intake.setPivot(INTAKE_INT);
+            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
             wallCollect = true;
         }
         if (gamepad1.triangle) {
             robot.intake.setPivot(INTAKE_TRANSFER);
             wallCollect = false;
-        }
-
-        if (gamepad1.circle && compactTimer.seconds() > 0.5) {
-            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
-            robot.intake.OpenIntake(CLAW_OPEN);
-            robot.intake.setPivot(INTAKE_INT);
-
-            intakeState = IntakeState.INTAKE_START;
-            compactTimer.reset();
         }
     }
 
@@ -426,7 +394,7 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void handleAscent() {
-        if (gamepad2.left_bumper) {
+        if (gamepad2.right_bumper) {
             intakeState = IntakeState.INTAKE_START;
             ascentStep = 0;
             return;
@@ -538,12 +506,6 @@ public class fsmDriveModeNew extends OpMode {
                 break;
             case INTAKE_CLAW_COLLECT_POSITION:
                 handleIntakeClawCollectPosition();
-                break;
-            case INTAKE_PRE_COLLECT_COMPACT:
-                handleIntakePreCompactCollect();
-                break;
-            case INTAKE_COLLECT_COMPACT:
-                handleIntakeCompactCollect();
                 break;
             case TRANSFER:
                 handleTransfer();

@@ -21,10 +21,14 @@ public class outtake {
 
 //        outtakeSensor = hardwareMap.get(DistanceSensor.class, "outtakeSensor");
 
+        outtake.setDirection(Servo.Direction.REVERSE);
+
         pivotOut1.setDirection(Servo.Direction.FORWARD);
         pivotOut2.setDirection(Servo.Direction.REVERSE);
+
         outtakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         outtakeMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+
         outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
