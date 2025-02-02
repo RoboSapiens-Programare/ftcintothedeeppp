@@ -162,23 +162,11 @@ public class fsmDriveModeNew extends OpMode {
         }
 
         if (gamepad2.dpad_up) {
-            if (!outtakeSliderManip) {
-                robot.outtake.outtakeMotor.setPower(0.8);
-                robot.outtake.outtakeMotor.setTargetPosition(robot.outtake.outtakeMotor.getCurrentPosition() - 5000);
-                outtakeSliderManip = true;
-            }
+            // implement
         }
 
         if (gamepad2.dpad_down) {
-            if (outtakeSliderManip) {
-                OUTTAKE_EXTEND = robot.outtake.outtakeMotor.getCurrentPosition();
-                OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_EXTEND + 785;
-                OUTTAKE_RETRACT = OUTTAKE_EXTEND + 1235;
-                outtakeSliderManip = false;
-
-
-                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
-            }
+            // implement
         }
 
 
@@ -374,7 +362,7 @@ public class fsmDriveModeNew extends OpMode {
         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         if (outtakeTimer.seconds()>0.35)
         {
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.4);
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
             intakeState = IntakeState.INTAKE_START;
         }
     }
@@ -491,10 +479,9 @@ public class fsmDriveModeNew extends OpMode {
     public void loop() {
         telemetry.addData("valoare glisiera", robot.intake.intakeMotor.getCurrentPosition());
         telemetry.addData("State", intakeState);
-        telemetry.addData("left joystick x", gamepad1.left_stick_x);
-        telemetry.addData("left joystick y", gamepad1.left_stick_y);
-        telemetry.addData("right joystick x", gamepad1.right_stick_x);
-        telemetry.addData("right joystick y", gamepad1.right_stick_y);
+        telemetry.addData("outtake motor 1", robot.outtake.outtakeMotor.getCurrentPosition());
+        telemetry.addData("outtake motor 2", robot.outtake.outtakeMotor2.getCurrentPosition());
+        telemetry.addData("outtake sensor", robot.outtake.outtakeSensor.isPressed());
 
         switch (intakeState) {
 

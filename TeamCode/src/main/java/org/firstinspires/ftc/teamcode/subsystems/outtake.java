@@ -5,11 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class outtake {
     public Servo pivotOut1, pivotOut2, outtake;
 //    public DistanceSensor outtakeSensor;
     public DcMotorEx outtakeMotor, outtakeMotor2;
+
+    public TouchSensor outtakeSensor;
 
     public outtake(HardwareMap hardwareMap){
         pivotOut1 = hardwareMap.get(Servo.class, "pivotOut1");
@@ -19,7 +22,7 @@ public class outtake {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
         outtakeMotor2 = hardwareMap.get(DcMotorEx.class, "outtakeMotor2");
 
-//        outtakeSensor = hardwareMap.get(DistanceSensor.class, "outtakeSensor");
+        outtakeSensor = hardwareMap.get(TouchSensor.class, "outtakeSensor");
 
         outtake.setDirection(Servo.Direction.REVERSE);
 
@@ -46,13 +49,15 @@ public class outtake {
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         outtakeMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        if(outtakeMotor.getCurrentPosition() > ManualTarget && outtakeMotor2.getCurrentPosition() > ManualTarget)
-        {
+        if(outtakeMotor.getCurrentPosition() > ManualTarget && outtakeMotor2.getCurrentPosition() > ManualTarget) {
             outtakeMotor.setPower(power);
             outtakeMotor2.setPower(power);
-        }
-        else
-        {
+
+        } else if (!outtakeSensor.isPressed() && outtakeMotor.getCurrentPosition() < ManualTarget && outtakeMotor2.getCurrentPosition() < ManualTarget) {
+            outtakeMotor.setPower(-power);
+            outtakeMotor2.setPower(-power);
+
+        } else {
             outtakeMotor.setPower(-power);
             outtakeMotor2.setPower(-power);
 

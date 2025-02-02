@@ -15,7 +15,7 @@ public class universalValues {
     public static double INTAKE_TRANSFER = 0.93;
 
     public static double CLAW_CLOSE = 0.435;
-    public static double CLAW_LOOSE = 0.462;
+    public static double CLAW_LOOSE = 0.4666;
     public static double CLAW_OPEN = 0.7;
 
     public static double CLAW_VERTICAL = 0.4;
@@ -23,6 +23,7 @@ public class universalValues {
     public static double CLAW_FLIPPED = 0.08;
 
     public static double OUTTAKE_DUMP_BUCKET = 0.7;
+    public static double OUTTAKE_DUMP_BUCKET_DIAG = 0.8;
     public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.36875;
     public static double OUTTAKE_COLLECT = 0.04;
 
@@ -53,7 +54,7 @@ public class universalValues {
     public static int OUTTAKE_EXTEND =  -1770;
     public static int OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = -1000;
 
-    public static int OUTTAKE_RETRACT = -50;
+    public static int OUTTAKE_RETRACT = 0;
 
     public static int INTAKE_RETRACT = 0;
 }
