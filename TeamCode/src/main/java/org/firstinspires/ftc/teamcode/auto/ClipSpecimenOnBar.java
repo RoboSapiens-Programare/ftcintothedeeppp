@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
 import java.util.List;
 
-@Autonomous(name = "Specimen Auto", group = "Autonomous")
+@Autonomous(name = "SPECIMEN", group = "0. Autonomous")
 public class ClipSpecimenOnBar extends OpMode {
 
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
@@ -61,16 +61,16 @@ public class ClipSpecimenOnBar extends OpMode {
 
     // TODO: modify y offset to correct pedro path visualiser offset
 
-    private final Pose startPose = new Pose(7,49, Math.toRadians(180));
+    private final Pose startPose = new Pose(7.5,49, Math.toRadians(180));
     private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
     private final Pose specimenPickup1 = new Pose(20.1, 29, Math.toRadians(180));
-    private final Pose barCliponPose1 = new Pose(32.75,65, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(35,72.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(35, 75.5, Math.toRadians(180));
-    private final Pose barCliponPose4 = new Pose(35, 78.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(36.785,65, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(36.5,72.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(36.5, 76.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(36.7, 81.5, Math.toRadians(180));
     private final Pose ParkPose = new Pose(2,32, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
     private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
@@ -101,7 +101,7 @@ public class ClipSpecimenOnBar extends OpMode {
 
         toHuman1 = follower.pathBuilder()
                 //.setZeroPowerAccelerationMultiplier(3)
-                .addPath(new BezierLine(new Point(behindSample1), new Point(pushSample1)))
+                .addPath(new BezierLine(new Point(behindSample1), new Point(pushSample1.getX()-50, pushSample1.getY())))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
@@ -117,7 +117,7 @@ public class ClipSpecimenOnBar extends OpMode {
                 .build();
 
         toHuman2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(behindSample2), new Point(pushSample2)))
+                .addPath(new BezierLine(new Point(behindSample2), new Point(pushSample2.getX() - 50, pushSample2.getY())))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
@@ -265,22 +265,20 @@ public class ClipSpecimenOnBar extends OpMode {
                         stateTimer.resetTimer();
                         singleton = false;
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 2.3)
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7)
                     {
                         singleton3 = false;
                         robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 2.7)
+                    if (stateTimer.getElapsedTimeSeconds() > 2.1)
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 2.9) {
+                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(universalValues.INTAKE_UP);
 
-                            if (stateTimer.getElapsedTimeSeconds() > 2) {
-                                follower.followPath(toBar2, true);
-                                setPathState(7);
-                            }
+                            follower.followPath(toBar2, true);
+                            setPathState(7);
                         }
                     }
 
@@ -324,17 +322,17 @@ public class ClipSpecimenOnBar extends OpMode {
                         stateTimer.resetTimer();
                         singleton = false;
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.3) {
+                    if (stateTimer.getElapsedTimeSeconds() > 0.7) {
                         singleton3 = false;
                         robot.intake.ManualLevel(INTAKE_RETRACT + 150, 1);
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.7) {
+                    if (stateTimer.getElapsedTimeSeconds() > 1.1) {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 1.9) {
+                        if (stateTimer.getElapsedTimeSeconds() > 1.3) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(universalValues.INTAKE_UP);
 
-                            if (stateTimer.getElapsedTimeSeconds() > 2) {
+                            if (stateTimer.getElapsedTimeSeconds() > 1.4) {
                                 follower.followPath(toBar3, true);
                                 setPathState(9);
                             }
@@ -382,17 +380,17 @@ public class ClipSpecimenOnBar extends OpMode {
                         stateTimer.resetTimer();
                         singleton = false;
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.3) {
+                    if (stateTimer.getElapsedTimeSeconds() > 0.7) {
                         singleton3 = false;
                         robot.intake.ManualLevel(INTAKE_RETRACT + 150, 1);
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.7) {
+                    if (stateTimer.getElapsedTimeSeconds() > 1.1) {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 1.9) {
+                        if (stateTimer.getElapsedTimeSeconds() > 1.3) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(universalValues.INTAKE_UP);
 
-                            if (stateTimer.getElapsedTimeSeconds() > 2) {
+                            if (stateTimer.getElapsedTimeSeconds() > 1.4) {
                                 follower.followPath(toBar4, true);
                                 setPathState(11);
                             }

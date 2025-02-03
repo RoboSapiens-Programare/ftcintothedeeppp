@@ -28,21 +28,25 @@ public class ClawTest extends OpMode {
 
     @Override
     public void loop() {
-        /*
+
         if (step == 0) {
-            robot.intake.setPivot(universalValues.INTAKE_UP);
+            robot.intake.OpenIntake(universalValues.CLAW_OPEN);
             ++step;
         }
         if (timer.getElapsedTimeSeconds() > 1 && step == 1) {
-            robot.intake.setPivot(universalValues.INTAKE_DOWN);
+            robot.intake.OpenIntake(universalValues.CLAW_LOOSE);
             ++step;
         }
         if (timer.getElapsedTimeSeconds() > 2 && step == 2) {
+            robot.intake.OpenIntake(universalValues.CLAW_CLOSE);
+            ++step;
+        }
+        if (timer.getElapsedTimeSeconds() > 3 && step == 3) {
             timer.resetTimer();
             step = 0;
         }
-        */
 
-        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+
+//        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
     }
 }

@@ -50,7 +50,7 @@ import org.firstinspires.ftc.teamcode.subsystems.robot;
 import java.util.Arrays;
 import java.util.List;
 
-@TeleOp(name = "FSM DRIVE MODE NEW", group = "FSMTELEOP")
+@TeleOp(name = "FSM DRIVE MODE", group = "0. TeleOp")
 public class fsmDriveModeNew extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot;
     private Follower follower;

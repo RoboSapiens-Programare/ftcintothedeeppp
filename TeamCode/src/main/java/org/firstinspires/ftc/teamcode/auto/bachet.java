@@ -37,7 +37,7 @@ import org.firstinspires.ftc.teamcode.subsystems.robot;
 
 import java.util.List;
 
-@Autonomous(name = "0+4", group = "Autonomous")
+@Autonomous(name = "BUCKET", group = "0. Autonomous")
 public class bachet extends OpMode {
 
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
@@ -65,8 +65,8 @@ public class bachet extends OpMode {
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 107.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose scorePose = new Pose(15.750 + OFFSET_X, 126.250 + OFFSET_Y, Math.toRadians(-45));
     private final Pose grabFirstSamplePose = new Pose(28.700 + OFFSET_X, 128.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(29.000 + OFFSET_X, 117.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabThirdSamplePose = new Pose(33.250 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(35));
+    private final Pose grabSecodSamplePose = new Pose(28.700 + OFFSET_X, 117.000 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabThirdSamplePose = new Pose(32.250 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(35));
     private final Pose parkPose = new Pose(62.000 + OFFSET_X, 97.000 + OFFSET_Y, Math.toRadians(-90));
 
 
@@ -189,16 +189,16 @@ public class bachet extends OpMode {
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 1) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2 && stateStep == 2) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
-                    if (poseTimer.getElapsedTimeSeconds() > 3 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2.5 && stateStep == 3) {
                         follower.followPath(grabFirstSample, true);
                         setPathState(2);
                     }
@@ -256,18 +256,18 @@ public class bachet extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
 
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.2 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.7 && stateStep == 2) {
                         robot.intake.setPivot(INTAKE_INT);
 
                         follower.followPath(grabSecondSample, true);
@@ -328,18 +328,18 @@ public class bachet extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
 
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.2 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.7 && stateStep == 2) {
                         robot.intake.setPivot(INTAKE_INT);
 
                         follower.followPath(grabThirdSample, true);
@@ -364,13 +364,15 @@ public class bachet extends OpMode {
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
-                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
-                        sliderManip = false;
+                        robot.intake.setPivot(INTAKE_DOWN);
+
                         ++stateStep;
                     }
 
                     if (poseTimer.getElapsedTimeSeconds() > 1.2 && stateStep == 1) {
-                        robot.intake.setPivot(INTAKE_DOWN);
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        sliderManip = false;
+
                         ++stateStep;
                     }
 
@@ -408,18 +410,17 @@ public class bachet extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.2 && stateStep == 2) {
-                        robot.intake.setPivot(INTAKE_INT);
+                    if (poseTimer.getElapsedTimeSeconds() > 1.7 && stateStep == 2) {
 
                         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
 
@@ -433,6 +434,7 @@ public class bachet extends OpMode {
 
             case 8:
                 robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+                robot.intake.setPivot(0.7);
 
                 if ((follower.getPose().getX() > parkPose.getX() - 1) &&
                         (follower.getPose().getY() < parkPose.getY() + 1)) {
