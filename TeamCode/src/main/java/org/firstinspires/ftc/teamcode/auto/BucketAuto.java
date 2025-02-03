@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_OPEN;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -15,14 +15,16 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
+import org.firstinspires.ftc.teamcode.constants.UniversalValues;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
 
+@Disabled
 @Autonomous(name = "Bucket Auto", group = "Autonomous")
 public class BucketAuto extends OpMode {
 private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
@@ -139,7 +141,7 @@ public void autonomousPathUpdate() {
         case 0:
 
             //GOES TO SCORE POSITION
-            robot.intake.setPivot(universalValues.INTAKE_INT);
+            robot.intake.setPivot(UniversalValues.INTAKE_INT);
             follower.followPath(scorePreload,true);
             actionTimer.resetTimer();
             setPathState(1);
@@ -149,7 +151,7 @@ public void autonomousPathUpdate() {
 
             //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
             if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
 
 
                 if (actionTimer.getElapsedTimeSeconds() > 3)
@@ -168,7 +170,7 @@ public void autonomousPathUpdate() {
                         {
                             robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
 
-                            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
 
                             if (actionTimer.getElapsedTimeSeconds() > 7)
                             {
@@ -211,7 +213,7 @@ public void autonomousPathUpdate() {
 
             //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
             if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
 
 
                 if (actionTimer.getElapsedTimeSeconds() > 1)
@@ -227,7 +229,7 @@ public void autonomousPathUpdate() {
                         {
 
                             robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
-                            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
 
                             if (actionTimer.getElapsedTimeSeconds() > 5)
                             {
@@ -271,7 +273,7 @@ public void autonomousPathUpdate() {
 
             //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING THIRD SAMPLE POSITION AND HOLDS
             if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
 
 
                 if (actionTimer.getElapsedTimeSeconds() > 3)
@@ -288,7 +290,7 @@ public void autonomousPathUpdate() {
                             isTransferDone = false;
                             isSpecimeninClaw = false;
                             robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
-                            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
                             robot.outtake.ManualLevel(0, 0.4);
                         }
 
@@ -319,9 +321,9 @@ public void autonomousPathUpdate() {
                 robot.outtake.ManualLevel(0,0.75);
                 robot.intake.ManualLevel(0,1);
 
-                robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
 
-                robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+                robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
 
                 singleton2 = true;
                 singleton = true;
@@ -332,11 +334,11 @@ public void autonomousPathUpdate() {
         //EMERGENCY PARK CASE
         case 9:
             robot.intake.ManualLevel(0,1);
-            robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-            robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-            robot.intake.setPivot(universalValues.INTAKE_INIT);
-            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-            robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+            robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+            robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+            robot.intake.setPivot(UniversalValues.INTAKE_INIT);
+            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+            robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
             PathChain parkEmergency;
             parkEmergency = follower.pathBuilder()
                     .setZeroPowerAccelerationMultiplier(8)
@@ -352,11 +354,11 @@ public void autonomousPathUpdate() {
     public void transfer() {
         if (transfersingleton1)
         {
-            robot.intake.OpenIntake(universalValues.CLAW_OPEN-0.275);
-            robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+            robot.intake.OpenIntake(UniversalValues.CLAW_OPEN-0.275);
+            robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
 
 
-            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
             transfersingleton1 = false;
         }
         if (transferTimer.getElapsedTimeSeconds() > 1)
@@ -364,7 +366,7 @@ public void autonomousPathUpdate() {
             if (transfersingleton7)
             {
                 robot.intake.ManualLevel(INTAKE_EXTEND,1);
-                robot.intake.setPivot(universalValues.INTAKE_DOWN);
+                robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
                 transfersingleton7 = false;
             }
 
@@ -373,15 +375,15 @@ public void autonomousPathUpdate() {
         {
             if (transfersingleton2)
             {
-                robot.intake.CloseIntake(universalValues.CLAW_CLOSE - 0.05);
+                robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE - 0.05);
 
                 transfersingleton2 = false;
             }
             if (transferTimer.getElapsedTimeSeconds() > 3.25)
             {
                 if (transfersingleton3) {
-                    robot.intake.setPivot(universalValues.INTAKE_UP);
-                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
+                    robot.intake.setPivot(UniversalValues.INTAKE_UP);
+                    robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_OPEN);
                     isSpecimeninClaw = true;
                     transfersingleton3 = false;
                 }
@@ -396,12 +398,12 @@ public void autonomousPathUpdate() {
                     {
                         if (transfersingleton6)
                         {
-                            robot.outtake.OpenOuttake(universalValues.OUTTAKE_CLOSE-0.075);
+                            robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_CLOSE-0.075);
                             transfersingleton6 = false;
                         }
                         if (transferTimer.getElapsedTimeSeconds() > 6)
                         {
-                            robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+                            robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
                             if (transferTimer.getElapsedTimeSeconds() > 6)
                             {
                                 if (transfersingleton5) {
@@ -409,10 +411,10 @@ public void autonomousPathUpdate() {
 
                                     transfersingleton5 = false;
                                 }
-                                robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+                                robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
                                 if (transferTimer.getElapsedTimeSeconds() > 6.25)
                                 {
-                                    robot.intake.setPivot(universalValues.INTAKE_DOWN+0.2);
+                                    robot.intake.setPivot(UniversalValues.INTAKE_DOWN+0.2);
                                     if (transferTimer.getElapsedTimeSeconds() > 6.75)
                                     {
                                         robot.intake.ManualLevel(0, 1);
@@ -489,11 +491,11 @@ public void init() {
 
     // Set the subsystems to positions for init
     robot.intake.ManualLevel(0,1);
-    robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-    robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-    robot.intake.setPivot(universalValues.INTAKE_INIT);
-    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-    robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+    robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+    robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+    robot.intake.setPivot(UniversalValues.INTAKE_INIT);
+    robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+    robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
 }
 
 /** This method is called continuously after Init while waiting for "play". **/

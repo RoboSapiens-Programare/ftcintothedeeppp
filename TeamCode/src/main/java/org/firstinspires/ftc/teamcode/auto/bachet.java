@@ -1,20 +1,20 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_DOWN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_UP;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET_DIAG;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_DOWN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_UP;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET_DIAG;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_RETRACT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;

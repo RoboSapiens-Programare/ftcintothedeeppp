@@ -11,13 +11,15 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
+import org.firstinspires.ftc.teamcode.constants.UniversalValues;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
+@Disabled
 @Autonomous(name="Bucket Auto New", group = "Autonomous")
 public class BucketAutoNew extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
@@ -153,21 +155,21 @@ public class BucketAutoNew extends OpMode {
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.update();
 
-        robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
-        robot.intake.setPivot(universalValues.INTAKE_INIT);
-        robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-        robot.intake.CloseIntake(universalValues.CLAW_OPEN);
+        robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.8);
+        robot.intake.setPivot(UniversalValues.INTAKE_INIT);
+        robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
 
-        robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
-        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
-        robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_RETRACT, 0.8);
+        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
+        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
 
     }
 
     @Override
     public void init_loop() {
-        robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
-        robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
+        robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.8);
+        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_RETRACT, 0.8);
     }
 
     @Override
@@ -176,7 +178,7 @@ public class BucketAutoNew extends OpMode {
         follower.update();
 
         if (!intakeSliderManip)
-            robot.intake.ManualLevel(universalValues.INTAKE_RETRACT, 0.8);
+            robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.8);
 
         autoPathUpdate();
         //transfer();
@@ -206,19 +208,19 @@ public class BucketAutoNew extends OpMode {
                     (follower.getPose().getY() > scorePose.getY() - 1)) {
                     if (step == 0) {
                         actionTimer.resetTimer();
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
-                        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
                         ++step;
                     }
 
                     if (step == 1 && actionTimer.getElapsedTimeSeconds() > 0.3) {
-                        robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                        robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
                         ++step;
                     }
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.6) {
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
-                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_RETRACT, 0.8);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(grabFirstSample, true);
                         changePathState(PathState.GRAB_FIRST);
@@ -233,21 +235,21 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 0) {
                         actionTimer.resetTimer();
-                        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 0.8);
-                        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
-                        robot.intake.setPivot(universalValues.INTAKE_DOWN);
+                        robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 0.8);
+                        robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                        robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
 
                         ++step;
                     }
 
                     if (step == 1 && actionTimer.getElapsedTimeSeconds() > 0.5) {
-                        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
 
                         ++step;
                     }
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
-                        robot.intake.setPivot(universalValues.INTAKE_INT);
+                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
 
                         follower.followPath(scoreFirstSample, true);
                         changePathState(PathState.SCORE_FIRST);
@@ -267,20 +269,20 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 0) {
                         actionTimer.resetTimer();
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
-                        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
 
                         ++step;
                     }
 
                     if (step == 1 && actionTimer.getElapsedTimeSeconds() > 0.3) {
-                        robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                        robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
                         ++step;
                     }
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.6) {
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
-                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_RETRACT, 0.8);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(grabSecondSample, true);
                         robot.universalTransfer.resetTransfer();
@@ -296,21 +298,21 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 0) {
                         actionTimer.resetTimer();
-                        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 0.8);
-                        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
-                        robot.intake.setPivot(universalValues.INTAKE_DOWN);
+                        robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 0.8);
+                        robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                        robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
 
                         ++step;
                     }
 
                     if (step == 1 && actionTimer.getElapsedTimeSeconds() > 0.5) {
-                        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
 
                         ++step;
                     }
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.7) {
-                        robot.intake.setPivot(universalValues.INTAKE_INT);
+                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
 
                         follower.followPath(scoreSecondSample, true);
                         changePathState(PathState.SCORE_SECOND);
@@ -330,21 +332,21 @@ public class BucketAutoNew extends OpMode {
 
                     if (step == 0) {
                         actionTimer.resetTimer();
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 0.8);
-                        robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 0.8);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
 
                         ++step;
                     }
 
                     if (step == 1 && actionTimer.getElapsedTimeSeconds() > 0.3) {
-                        robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                        robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
 
                         ++step;
                     }
 
                     if (step == 2 && actionTimer.getElapsedTimeSeconds() > 0.6) {
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_RETRACT, 0.8);
-                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_RETRACT, 0.8);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
                         follower.followPath(pushThirdSample, true);
                         robot.universalTransfer.resetTransfer();

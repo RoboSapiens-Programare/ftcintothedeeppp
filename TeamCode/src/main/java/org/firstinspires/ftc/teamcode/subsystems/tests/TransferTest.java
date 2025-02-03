@@ -1,12 +1,14 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.subsystems.tests;
 
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.constants.UniversalValues;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
+@Disabled
 @Autonomous(name = "Transfer Test", group = "Subsystem Tests")
 public class TransferTest extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot;
@@ -17,12 +19,12 @@ public class TransferTest extends OpMode {
         robot = new robot(hardwareMap);
         actionTimer = new Timer();
 
-        robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND,0.75);
-        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-        robot.intake.setPivot(universalValues.INTAKE_INT);
-        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
-        robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+        robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+        robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND,0.75);
+        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
     }
 
     @Override

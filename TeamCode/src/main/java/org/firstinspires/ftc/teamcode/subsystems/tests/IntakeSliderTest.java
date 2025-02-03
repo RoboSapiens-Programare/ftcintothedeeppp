@@ -1,16 +1,17 @@
-package org.firstinspires.ftc.teamcode.auto;
-
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
+package org.firstinspires.ftc.teamcode.subsystems.tests;
 
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@Autonomous(name = "Intake Slider Test", group = "Autonomous")
+import org.firstinspires.ftc.teamcode.constants.UniversalValues;
+import org.firstinspires.ftc.teamcode.subsystems.robot;
+
+@Disabled
+@Autonomous(name = "Intake Slider Test", group = "Subsystem Tests")
 public class IntakeSliderTest extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
 
@@ -34,11 +35,11 @@ public class IntakeSliderTest extends OpMode {
         singletonRetract = true;
 
         robot.intake.ManualLevel(0,1);
-        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-        robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-        robot.intake.setPivot(universalValues.INTAKE_INT);
-        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-        robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+        robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
 
         DcMotorEx intakeMotor;
 
@@ -56,7 +57,7 @@ public class IntakeSliderTest extends OpMode {
         }
         if (singletonExtend) {
 
-            robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 0.75);
+            robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 0.75);
             singletonExtend = false;
         }
         if (actionTimer.getElapsedTimeSeconds() > 3) {

@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_SPECIMEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_SPECIMEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_RETRACT;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -26,8 +26,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
+import org.firstinspires.ftc.teamcode.constants.UniversalValues;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
 import java.util.List;
 
@@ -197,7 +197,7 @@ public class ClipSpecimenOnBar extends OpMode {
             case(1):
                 if (singleton2)
                 {
-                    robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
+                    robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
                     singleton2 = false;
                 }
 
@@ -247,8 +247,8 @@ public class ClipSpecimenOnBar extends OpMode {
                 if((follower.getPose().getX() < (pushSample2.getX() + 1) && follower.getPose().getY() < (pushSample2.getY() + 1)))
                 {
                         follower.followPath(toSpecimenPickup1, true);
-                        robot.intake.setPivot(universalValues.INTAKE_INT);
-                        robot.intake.CloseIntake(universalValues.CLAW_OPEN);
+                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
                         setPathState(6);
                 }
                 break;
@@ -275,7 +275,7 @@ public class ClipSpecimenOnBar extends OpMode {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 2.3) {
                             robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(universalValues.INTAKE_UP);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             follower.followPath(toBar2, true);
                             setPathState(7);
@@ -330,7 +330,7 @@ public class ClipSpecimenOnBar extends OpMode {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 1.3) {
                             robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(universalValues.INTAKE_UP);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             if (stateTimer.getElapsedTimeSeconds() > 1.4) {
                                 follower.followPath(toBar3, true);
@@ -388,7 +388,7 @@ public class ClipSpecimenOnBar extends OpMode {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 1.3) {
                             robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(universalValues.INTAKE_UP);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             if (stateTimer.getElapsedTimeSeconds() > 1.4) {
                                 follower.followPath(toBar4, true);

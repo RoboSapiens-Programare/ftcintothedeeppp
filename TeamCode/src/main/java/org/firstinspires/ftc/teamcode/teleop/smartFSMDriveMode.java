@@ -1,26 +1,26 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_TIMER;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_VERTICAL;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_DOWN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INIT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_INT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_RETRACT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_UP;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_DOWN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLIPON_UP;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_CLOSE;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_COLLECT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_DUMP_BUCKET;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_EXTEND_MID;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_RETRACT;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.OUTTAKE_OPEN;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.PIVOT_TIMER;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_TIMER;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_VERTICAL;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_DOWN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_UP;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLIPON_DOWN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLIPON_UP;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_MID;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.PIVOT_TIMER;
 import static java.lang.Math.abs;
 
 import com.pedropathing.follower.Follower;
@@ -31,6 +31,7 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -48,6 +49,7 @@ import org.firstinspires.ftc.teamcode.subsystems.robot;
 
 // CURRENT STATUS: NOT TESTED
 
+@Disabled
 @TeleOp(name = "SMART FSM DRIVE MODE", group = "FSMTELEOP")
 public class smartFSMDriveMode extends OpMode {
 

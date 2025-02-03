@@ -8,13 +8,15 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
+import org.firstinspires.ftc.teamcode.constants.UniversalValues;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import org.firstinspires.ftc.teamcode.subsystems.universalValues;
 
+@Disabled
 @Autonomous(name = "Auto Push Specimen", group = "Autonomous")
 public class ParkSpecimen extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
@@ -96,11 +98,11 @@ public class ParkSpecimen extends OpMode {
 
         // Set the subsystems to positions for init
         robot.intake.ManualLevel(0,1);
-        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-        robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-        robot.intake.setPivot(universalValues.INTAKE_INIT);
-        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-        robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+        robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+        robot.intake.setPivot(UniversalValues.INTAKE_INIT);
+        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
     }
 
     @Override
