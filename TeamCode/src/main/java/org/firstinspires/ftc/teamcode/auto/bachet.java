@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_HORIZONTAL;
-import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_LOOSE;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_DOWN;
 import static org.firstinspires.ftc.teamcode.subsystems.universalValues.INTAKE_EXTEND;
@@ -65,8 +65,8 @@ public class bachet extends OpMode {
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 107.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose scorePose = new Pose(15.750 + OFFSET_X, 126.250 + OFFSET_Y, Math.toRadians(-45));
     private final Pose grabFirstSamplePose = new Pose(28.700 + OFFSET_X, 128.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(28.700 + OFFSET_X, 118.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabThirdSamplePose = new Pose(33.000 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(35));
+    private final Pose grabSecodSamplePose = new Pose(29.000 + OFFSET_X, 117.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabThirdSamplePose = new Pose(33.250 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(35));
     private final Pose parkPose = new Pose(62.000 + OFFSET_X, 97.000 + OFFSET_Y, Math.toRadians(-90));
 
 
@@ -220,16 +220,20 @@ public class bachet extends OpMode {
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                         sliderManip = false;
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.2 && stateStep == 1) {
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 1) {
-                        robot.intake.CloseIntake(CLAW_LOOSE);
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 3) {
                         robot.universalTransfer.transfer();
                         if (robot.universalTransfer.isTransferCompleted()) {
                             robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
@@ -289,16 +293,20 @@ public class bachet extends OpMode {
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                         sliderManip = false;
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.2 && stateStep == 1) {
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 1) {
-                        robot.intake.CloseIntake(CLAW_LOOSE);
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 3) {
                         robot.universalTransfer.transfer();
                         if (robot.universalTransfer.isTransferCompleted()) {
                             robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
@@ -358,22 +366,26 @@ public class bachet extends OpMode {
                     if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                         sliderManip = false;
+                        ++stateStep;
+                    }
+
+                    if (poseTimer.getElapsedTimeSeconds() > 1.2 && stateStep == 1) {
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 1) {
-                        robot.intake.CloseIntake(CLAW_LOOSE);
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.9 && stateStep == 3) {
                         robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
                         robot.intake.setPivot(INTAKE_UP);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.2 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 2.2 && stateStep == 4) {
                         robot.universalTransfer.transfer();
                         if (robot.universalTransfer.isTransferCompleted()) {
                             robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
@@ -388,8 +400,8 @@ public class bachet extends OpMode {
 
             case (7):
 
-                if ((follower.getPose().getX() > scorePose.getX() - 1) &&
-                        (follower.getPose().getY() < scorePose.getY() + 1)) {
+                if ((follower.getPose().getX() < scorePose.getX() + 1) &&
+                        (follower.getPose().getY() > scorePose.getY() - 1)) {
 
                     if (timerResetSingleton) {
                         poseTimer.resetTimer();
