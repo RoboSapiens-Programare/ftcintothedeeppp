@@ -50,7 +50,7 @@ public class UniversalValues {
     public static int OUTTAKE_EXTEND_MID = -1770;
     public static int OUTTAKE_EXTEND_GRAB = -1584;
     public static int OUTTAKE_ASCENT = -754;
-    public static int OUTTAKE_EXTEND_SPECIMEN = -600;
+    public static int OUTTAKE_EXTEND_SPECIMEN = -550;
     public static int OUTTAKE_EXTEND =  -1770;
     public static int OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = -1000;
 

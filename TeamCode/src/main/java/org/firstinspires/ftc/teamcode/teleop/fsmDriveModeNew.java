@@ -72,6 +72,7 @@ public class fsmDriveModeNew extends OpMode {
     private boolean intakeSliderManip = false;
     private boolean outtakeSliderManip = false;
     private boolean intakeFixSingleton = true;
+    private boolean outtakeFixSingleton = true;
     private boolean intakeMoveFixsingleton = true;
     private boolean fixExtensionSingleton = true;
 
@@ -161,13 +162,32 @@ public class fsmDriveModeNew extends OpMode {
             intakeFixSingleton = true;
         }
 
+        /*
         if (gamepad2.dpad_up) {
-            // implement
+            if (robot.outtake.outtakeSensor.isPressed()) {
+                OUTTAKE_RETRACT = robot.outtake.outtakeMotor.getCurrentPosition();
+                OUTTAKE_EXTEND = OUTTAKE_RETRACT -1770;
+                OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_RETRACT -550;
+                OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = OUTTAKE_RETRACT -1000;
+
+                outtakeSliderManip = false;
+                robot.intake.ManualLevel(INTAKE_RETRACT,0.8);
+                outtakeFixSingleton = false;
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition());
+                telemetry.addData("pijdakl", robot.intake.intakeLimit.isPressed());
+            }
+
+            if (!intakeSliderManip && !robot.intake.intakeLimit.isPressed() && outtakeFixSingleton) {
+                robot.intake.intakeMotor.setPower(-0.2);
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition() - 1000);
+                intakeSliderManip = true;
+            }
         }
 
         if (gamepad2.dpad_down) {
-            // implement
+            outtakeFixSingleton = true;
         }
+        */
 
 
         // EMERGENCY PARK
@@ -211,6 +231,8 @@ public class fsmDriveModeNew extends OpMode {
         }
         if(gamepad1.square){
             robot.intake.setPivot(INTAKE_INT);
+            robot.intake.setClawPivot(CLAW_HORIZONTAL);
+            clawPivot = CLAW_HORIZONTAL;
             wallCollect = true;
         }
         if (gamepad1.triangle) {
@@ -270,10 +292,7 @@ public class fsmDriveModeNew extends OpMode {
             if (wallCollect)
                 robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
 
-            if (intakeTimer.seconds() > 0.4 && wallCollect) {
-                robot.intake.CloseIntake(CLAW_OPEN);
-                intakeMoveFixsingleton = true;
-            } else {
+            if (intakeTimer.seconds() > 0.4 || !wallCollect) {
                 robot.intake.CloseIntake(CLAW_OPEN);
                 intakeMoveFixsingleton = true;
             }
@@ -309,6 +328,8 @@ public class fsmDriveModeNew extends OpMode {
         if(gamepad1.square){
             robot.intake.setPivot(INTAKE_INT);
             robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+            robot.intake.setClawPivot(CLAW_HORIZONTAL);
+            clawPivot = CLAW_HORIZONTAL;
             wallCollect = true;
         }
         if (gamepad1.triangle) {
@@ -357,13 +378,28 @@ public class fsmDriveModeNew extends OpMode {
     }
 
     private void handleOuttakeRetract() {
+        if (outtakeFixSingleton) {
+            outtakeFixSingleton = false;
 
-        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-        if (outtakeTimer.seconds()>0.35)
-        {
+            robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+            robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+
+            robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.outtake.outtakeMotor.setPower(0.4);
+            robot.outtake.outtakeMotor2.setPower(0.4);
+        }
+        if (robot.outtake.outtakeSensor.isPressed()) {
+            robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            OUTTAKE_RETRACT -= 15;
+
             robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
             intakeState = IntakeState.INTAKE_START;
+
+            outtakeFixSingleton = true;
         }
     }
 

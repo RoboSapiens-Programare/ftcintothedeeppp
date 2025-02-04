@@ -61,7 +61,7 @@ public class ClipSpecimenOnBar extends OpMode {
 
     // TODO: modify y offset to correct pedro path visualiser offset
 
-    private final Pose startPose = new Pose(7.5,49, Math.toRadians(180));
+    private final Pose startPose = new Pose(8.5,49, Math.toRadians(180));
     private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));

@@ -23,7 +23,7 @@ public class FConstants {
 
         FollowerConstants.useBrakeModeInTeleOp = true;
 
-        FollowerConstants.mass = 10;
+        FollowerConstants.mass = 13;
 
         FollowerConstants.xMovement = 75.34096617148526;
         FollowerConstants.yMovement = 55.33304819533794;
@@ -31,7 +31,7 @@ public class FConstants {
         FollowerConstants.forwardZeroPowerAcceleration = -23.667635870564364;
         FollowerConstants.lateralZeroPowerAcceleration = -65.57724187428536;
 
-        FollowerConstants.zeroPowerAccelerationMultiplier = 1.5;
+        FollowerConstants.zeroPowerAccelerationMultiplier = 2;
 
         FollowerConstants.translationalPIDFSwitch = 0;
         FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.41,0,0.03,0);
