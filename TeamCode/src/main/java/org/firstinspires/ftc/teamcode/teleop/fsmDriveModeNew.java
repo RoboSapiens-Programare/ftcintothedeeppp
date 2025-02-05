@@ -23,6 +23,7 @@ import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_A
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET_DIAG;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_ASCENT_INTERMEDIARY;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_GRAB;
@@ -225,10 +226,7 @@ public class fsmDriveModeNew extends OpMode {
             intakeState = IntakeState.TRANSFER;
         }
 
-        if(gamepad1.cross){
-            robot.intake.setPivot(INTAKE_DOWN);
-            wallCollect = false;
-        }
+
         if(gamepad1.square){
             robot.intake.setPivot(INTAKE_INT);
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
@@ -354,7 +352,7 @@ public class fsmDriveModeNew extends OpMode {
             outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
-        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }
@@ -371,7 +369,7 @@ public class fsmDriveModeNew extends OpMode {
 
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
-        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }
@@ -394,7 +392,13 @@ public class fsmDriveModeNew extends OpMode {
             robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            OUTTAKE_RETRACT -= 15;
+            OUTTAKE_RETRACT = -15;
+            OUTTAKE_EXTEND_MID = OUTTAKE_RETRACT -1770;
+            OUTTAKE_EXTEND_GRAB = OUTTAKE_RETRACT -1584;
+            OUTTAKE_ASCENT = OUTTAKE_RETRACT -754;
+            OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_RETRACT -550;
+            OUTTAKE_EXTEND = OUTTAKE_RETRACT -1770;
+            OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = OUTTAKE_RETRACT -1000;
 
             robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
             intakeState = IntakeState.INTAKE_START;
