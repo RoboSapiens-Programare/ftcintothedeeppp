@@ -22,7 +22,7 @@ public class UniversalValues {
     public static double CLAW_HORIZONTAL = 0.72;
     public static double CLAW_FLIPPED = 0.08;
 
-    public static double OUTTAKE_DUMP_BUCKET = 0.7;
+    public static double OUTTAKE_DUMP_BUCKET = 0.71;
     public static double OUTTAKE_DUMP_BUCKET_DIAG = 0.8;
     public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.36875;
     public static double OUTTAKE_COLLECT = 0.04;

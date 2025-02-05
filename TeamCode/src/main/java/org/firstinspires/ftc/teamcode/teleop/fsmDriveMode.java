@@ -1,41 +1,64 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
+import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_TIMER;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_VERTICAL;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_DOWN;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INT;
-import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_UP;
-import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLIPON_DOWN;
-import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLIPON_UP;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_TRANSFER;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_ASCENT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
-import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET_DIAG;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_ASCENT_INTERMEDIARY;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_GRAB;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_MID;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_SPECIMEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_GRAB_BAR;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.PIVOT_TIMER;
 import static java.lang.Math.abs;
 
 import com.pedropathing.follower.Follower;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.constants.FConstants;
+import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
 
-@Disabled
-@TeleOp(name = "FSM DRIVE MODE DEPRECATED", group = "FSMTELEOP")
+import java.util.Arrays;
+import java.util.List;
+
+@TeleOp(name = "FSM DRIVE MODE", group = "0. TeleOp")
 public class fsmDriveMode extends OpMode {
     private org.firstinspires.ftc.teamcode.subsystems.robot robot;
     private Follower follower;
     private final ElapsedTime intakeTimer = new ElapsedTime();
     private final ElapsedTime outtakeTimer = new ElapsedTime();
+    private final ElapsedTime compactTimer = new ElapsedTime();
+
     private boolean isHorizontal = true;
     private boolean isStarted = true;
     private boolean isPressed = false;
@@ -43,72 +66,201 @@ public class fsmDriveMode extends OpMode {
     private boolean isTimer = true;
     private boolean isMoving = false;
 
-    private enum IntakeState {
-        INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
-        OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE
-    }
+    private int ascentStep = 0;
 
-    private static final int OUTTAKE_LOW = 0;
-    private static final int INTAKE_LOW = 0;
+    private boolean wallCollect = false;
+    private boolean doAscent = false;
+    private boolean notransfer = false;
+    private boolean intakeSliderManip = false;
+    private boolean outtakeSliderManip = false;
+    private boolean intakeFixSingleton = true;
+    private boolean outtakeFixSingleton = true;
+    private boolean intakeMoveFixsingleton = true;
+    private boolean fixExtensionSingleton = true;
+
+    private DcMotorEx leftFront;
+    private DcMotorEx leftRear;
+    private DcMotorEx rightFront;
+    private DcMotorEx rightRear;
+    private List<DcMotorEx> motors;
+
+    private enum IntakeState {
+        INTAKE_START, INTAKE_CLAW_COLLECT_POSITION,
+        INTAKE_EXTEND, OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE,
+        TRANSFER, ASCENT
+    }
 
     private double clawPivot = CLAW_HORIZONTAL;
     private IntakeState intakeState = IntakeState.INTAKE_START;
 
     private void initializeRobot() {
-        robot.intake.ManualLevel(0, 1);
-        robot.intake.CloseIntake(CLAW_CLOSE);
+        robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+        robot.outtake.ManualLevel(0, 1);
+        robot.intake.CloseIntake(CLAW_OPEN);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
         robot.intake.setPivot(INTAKE_INIT);
-        robot.outtake.setPivot(OUTTAKE_COLLECT);
+        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
         robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
     }
 
     private void handleIntakeStart() {
+        telemetry.addData("OUTTAKE_EXTEND", OUTTAKE_EXTEND);
+        telemetry.addData("OUTTAKE_EXTEND_SPECIMEN", OUTTAKE_EXTEND_SPECIMEN);
+        telemetry.addData("OUTTAKE_RETRACT", OUTTAKE_RETRACT);
+
+        telemetry.addData("INTAKE_EXTEND", INTAKE_EXTEND);
+        telemetry.addData("INTAKE_RETRACT", INTAKE_RETRACT);
+
+        robot.universalTransfer.resetTransfer();
+        if (!intakeSliderManip) {
+            telemetry.addData("RETRACTING INTAKE", "true");
+            robot.intake.ManualLevel(INTAKE_RETRACT, 0.5);
+        }
+        if (!outtakeSliderManip) {
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+        }
         isPressed = false;
         isSquare = false;
         isMoving = false;
         if (isStarted) {
             robot.intake.setPivot(INTAKE_INT);
+            robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
             isStarted = false;
         }
         if (gamepad1.right_trigger > 0.1) {
-            robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+            robot.intake.ManualLevel(INTAKE_EXTEND, 0.75);
             intakeState = IntakeState.INTAKE_EXTEND;
-        }
-        if (intakeTimer.seconds() > 0.2) {
-            robot.intake.setPivot(INTAKE_INT);
-            robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
+            notransfer = true;
         }
         if (gamepad2.triangle) {
-            robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 1);
+            robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 0.75);
+            outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_MID;
         }
-        if (gamepad2.square) {
-            robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
+        if (gamepad1.circle) {
             intakeTimer.reset();
-            robot.outtake.OpenOuttake(OUTTAKE_CLOSE);
+            outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_SAMPLE;
+        }
+
+        if (gamepad2.dpad_left) {
+            if (robot.intake.intakeLimit.isPressed()) {
+                INTAKE_RETRACT = robot.intake.intakeMotor.getCurrentPosition();
+                INTAKE_EXTEND = INTAKE_RETRACT + 290;
+                intakeSliderManip = false;
+                robot.intake.ManualLevel(INTAKE_RETRACT,0.8);
+                intakeFixSingleton = false;
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition());
+                telemetry.addData("pijdakl", robot.intake.intakeLimit.isPressed());
+            }
+
+            if (!intakeSliderManip && !robot.intake.intakeLimit.isPressed() && intakeFixSingleton) {
+                robot.intake.intakeMotor.setPower(-0.2);
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition() - 1000);
+                intakeSliderManip = true;
+            }
+        }
+
+        if (gamepad2.dpad_right) {
+            intakeFixSingleton = true;
+        }
+
+        /*
+        if (gamepad2.dpad_up) {
+            if (robot.outtake.outtakeSensor.isPressed()) {
+                OUTTAKE_RETRACT = robot.outtake.outtakeMotor.getCurrentPosition();
+                OUTTAKE_EXTEND = OUTTAKE_RETRACT -1770;
+                OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_RETRACT -550;
+                OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = OUTTAKE_RETRACT -1000;
+
+                outtakeSliderManip = false;
+                robot.intake.ManualLevel(INTAKE_RETRACT,0.8);
+                outtakeFixSingleton = false;
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition());
+                telemetry.addData("pijdakl", robot.intake.intakeLimit.isPressed());
+            }
+
+            if (!intakeSliderManip && !robot.intake.intakeLimit.isPressed() && outtakeFixSingleton) {
+                robot.intake.intakeMotor.setPower(-0.2);
+                robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition() - 1000);
+                intakeSliderManip = true;
+            }
+        }
+
+        if (gamepad2.dpad_down) {
+            outtakeFixSingleton = true;
+        }
+        */
+
+
+        // EMERGENCY PARK
+        if (gamepad2.left_trigger > 0.1) {
+            robot.outtake.setPivot(0.9);
+        }
+        if (gamepad2.right_trigger > 0.1) {
+            robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+        }
+
+        // lvl 1 ascent
+        if (gamepad2.left_bumper) {
+            robot.outtake.setPivot(OUTTAKE_GRAB_BAR);
+            robot.outtake.ManualLevel(OUTTAKE_EXTEND_ASCENT_INTERMEDIARY, 0.8);
+
+            intakeState = IntakeState.ASCENT;
+        }
+
+
+        // compact collect
+        if (gamepad1.left_bumper) {
+            robot.intake.CloseIntake(CLAW_CLOSE);
+        } else if (gamepad1.right_bumper) {
+            robot.intake.OpenIntake(CLAW_OPEN);
+        }
+
+        adjustClawPivot();
+        adjustClawPosition();
+
+        if (gamepad1.left_trigger > 0.1 && !notransfer) {
+            robot.intake.setClawPivot(0.6);
+            clawPivot = 0.6;
+
+            robot.intake.setPivot(INTAKE_INT);
+            intakeState = IntakeState.TRANSFER;
+        }
+
+
+        if(gamepad1.square){
+            robot.intake.setPivot(INTAKE_INT);
+            robot.intake.setClawPivot(CLAW_HORIZONTAL);
+            clawPivot = CLAW_HORIZONTAL;
+            wallCollect = true;
+            notransfer = false;
+        }
+        if (gamepad1.triangle) {
+            robot.intake.setPivot(INTAKE_TRANSFER);
+            wallCollect = false;
         }
     }
 
     private void handleIntakeExtend() {
         if (abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 10) {
             robot.intake.setPivot(INTAKE_DOWN);
+            wallCollect = false;
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.OpenIntake(CLAW_OPEN - 0.185);
+            robot.intake.OpenIntake(CLAW_OPEN);
             intakeTimer.reset();
             intakeState = IntakeState.INTAKE_CLAW_COLLECT_POSITION;
         }
     }
 
     private void adjustClawPivot() {
-        if (gamepad1.dpad_right && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot < 1) {
-            clawPivot += 0.01;
+        if (gamepad1.dpad_right && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot > CLAW_VERTICAL) {
+            clawPivot -= 0.01;
             robot.intake.setClawPivot(clawPivot);
             outtakeTimer.reset();
-        } else if (gamepad1.dpad_left && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot > CLAW_VERTICAL) {
-            clawPivot -= 0.01;
+        } else if (gamepad1.dpad_left && outtakeTimer.seconds() > PIVOT_TIMER && clawPivot < 1) {
+            clawPivot += 0.01;
             robot.intake.setClawPivot(clawPivot);
             outtakeTimer.reset();
         }
@@ -127,62 +279,84 @@ public class fsmDriveMode extends OpMode {
     }
 
     private void handleIntakeClawCollectPosition() {
+        telemetry.addData("fixExtensionSingleton", fixExtensionSingleton);
+        telemetry.addData("intakeTimer", intakeTimer.seconds());
         if (gamepad1.left_bumper) {
+//            if (wallCollect)
+//                robot.intake.ManualLevel(INTAKE_EXTEND-50, 0.8);
             robot.intake.CloseIntake(CLAW_CLOSE);
-            robot.outtake.setPivot(OUTTAKE_COLLECT);
-        } else if (gamepad1.right_bumper) {
-            robot.intake.OpenIntake(CLAW_OPEN - 0.185);
-            robot.outtake.setPivot(OUTTAKE_COLLECT);
+            intakeMoveFixsingleton = true;
+
+        } else if (gamepad1.right_bumper || !intakeMoveFixsingleton) {
+
+            intakeMoveFixsingleton = false;
+            if (wallCollect)
+                robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+
+            if (intakeTimer.seconds() > 0.4 || !wallCollect) {
+                robot.intake.CloseIntake(CLAW_OPEN);
+                intakeMoveFixsingleton = true;
+            }
+
+        } else if (intakeMoveFixsingleton && fixExtensionSingleton) {
+            intakeTimer.reset();
         }
 
         adjustClawPivot();
         adjustClawPosition();
 
-        if (gamepad1.left_trigger > 0.1) {
-            robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+        if (gamepad1.left_trigger > 0.1 && !notransfer) {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.setPivot(INTAKE_UP);
-            if(intakeTimer.seconds() > 0.5) {
-                robot.intake.ManualLevel(INTAKE_LOW, 1);
-                intakeTimer.reset();
-                intakeState = IntakeState.INTAKE_RETRACT;
-            }
-        }
-        if(gamepad1.cross){
+
             robot.intake.setPivot(INTAKE_INT);
+            intakeState = IntakeState.TRANSFER;
+        }
+        if(gamepad1.cross || !fixExtensionSingleton || gamepad1.right_trigger > 0.1){
+            if (fixExtensionSingleton) {
+                robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                intakeTimer.reset();
+                fixExtensionSingleton = false;
+            }
+
+            if (intakeTimer.seconds() > 0.25) {
+                robot.intake.setPivot(INTAKE_DOWN);
+                fixExtensionSingleton = true;
+            }
+
+            wallCollect = false;
         }
         if(gamepad1.square){
-            robot.intake.setPivot(INTAKE_DOWN);
+            robot.intake.setPivot(INTAKE_INT);
+            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+            robot.intake.setClawPivot(CLAW_HORIZONTAL);
+            clawPivot = CLAW_HORIZONTAL;
+            wallCollect = true;
+            notransfer = false;
+        }
+        if (gamepad1.triangle) {
+            robot.intake.setPivot(INTAKE_TRANSFER);
+            wallCollect = false;
         }
     }
 
-    private void handleIntakeRetract() {
-        if (robot.intake.intakeLimit.isPressed()) isPressed = true;
-        if (isPressed) {
-            robot.intake.setPivot(INTAKE_UP);
-            if (intakeTimer.seconds() > CLAW_TIMER) {
-                robot.intake.OpenIntake(CLAW_OPEN);
-                robot.outtake.CloseOuttake(OUTTAKE_CLOSE - 0.07);
-                if(intakeTimer.seconds() > CLAW_TIMER + 0.3) {
-                    robot.intake.ManualLevel(300, 1);
-                    intakeTimer.reset();
-                }
-            }
-            if(robot.intake.intakeMotor.getCurrentPosition() > 200){
-                robot.intake.setPivot(INTAKE_INT);
-                robot.intake.ManualLevel(INTAKE_LOW,1);
-                intakeState = IntakeState.INTAKE_START;
-            }
+    private void handleTransfer() {
+        robot.universalTransfer.transfer();
+
+        telemetry.addData("transfer completed", robot.universalTransfer.isTransferCompleted());
+        if (!robot.universalTransfer.isTransferCompleted()){
+            return;
         }
+
+        intakeState = IntakeState.INTAKE_START;
     }
 
     private void handleOuttakeMid() {
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
+            outtakeTimer.reset();
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
-        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }
@@ -193,53 +367,118 @@ public class fsmDriveMode extends OpMode {
     }
 
     private void handleOuttakeExtend() {
+        robot.universalTransfer.resetTransfer();
+
         if (gamepad2.cross) {
-            robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
+
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
-        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }
     }
 
     private void handleOuttakeRetract() {
-        robot.outtake.setPivot(OUTTAKE_COLLECT);
-        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-        intakeState = IntakeState.INTAKE_START;
+        if (outtakeFixSingleton) {
+            outtakeFixSingleton = false;
+
+            robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+            robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+
+            robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            robot.outtake.outtakeMotor.setPower(0.4);
+            robot.outtake.outtakeMotor2.setPower(0.4);
+        }
+        if (robot.outtake.outtakeSensor.isPressed()) {
+            robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            OUTTAKE_RETRACT = -15;
+            OUTTAKE_EXTEND_MID = OUTTAKE_RETRACT -1770;
+            OUTTAKE_EXTEND_GRAB = OUTTAKE_RETRACT -1584;
+            OUTTAKE_ASCENT = OUTTAKE_RETRACT -754;
+            OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_RETRACT -550;
+            OUTTAKE_EXTEND = OUTTAKE_RETRACT -1770;
+            OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = OUTTAKE_RETRACT -1000;
+
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+            intakeState = IntakeState.INTAKE_START;
+
+            outtakeFixSingleton = true;
+        }
     }
 
     private void handleOuttakeSample() {
-        if(gamepad1.square && !isSquare) {
-            isSquare = true;
-            isTimer = true;
-        }
-        if(abs(gamepad1.left_stick_y) > 0.02 && isSquare && !isMoving){
-            isMoving = true;
-        }
-        if(isSquare && isMoving){
-            if(isTimer){
-                intakeTimer.reset();
-                isTimer = false;
+        robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+        if (outtakeTimer.seconds()>0.4)
+        {
+            robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+            if (outtakeTimer.seconds()>0.6)
+            {
+                robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+                robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+                intakeState=IntakeState.INTAKE_START;
             }
-            robot.outtake.setPivot(OUTTAKE_CLIPON_DOWN);
-            if(intakeTimer.seconds() > 0.3){
-                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+        }
+    }
 
-                if(intakeTimer.seconds() > 0.5) {
-                    robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
-                    robot.outtake.setPivot(OUTTAKE_COLLECT);
-                    intakeState = IntakeState.INTAKE_START;
-                    intakeTimer.reset();
-                }
+    private void handleAscent() {
+        if (gamepad2.right_bumper) {
+            intakeState = IntakeState.INTAKE_START;
+            ascentStep = 0;
+            return;
+        }
+
+        if (gamepad2.dpad_up) {
+            doAscent = true;
+        }
+
+        if (gamepad2.dpad_down) {
+            doAscent = false;
+        }
+
+        if (doAscent) {
+            if (ascentStep == 0) {
+                robot.outtake.ManualLevel(OUTTAKE_EXTEND_GRAB, 0.8);
+                outtakeTimer.reset();
+                ++ascentStep;
+            }
+
+            if (ascentStep == 1 && outtakeTimer.seconds() > 1) {
+                robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+                ++ascentStep;
+            }
+
+            if (ascentStep == 2 && outtakeTimer.seconds() > 1.35) {
+                robot.outtake.ManualLevel(OUTTAKE_ASCENT, 1);
+                robot.outtake.DisableServos();
+
+                ++ascentStep;
             }
         }
     }
 
     private void updateFollower(double power) {
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
-        follower.setMaxPower(power);
-        follower.update();
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x; // this is strafing
+        double rx = gamepad1.right_stick_x;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double leftFrontPower = (y + x + rx) / denominator;
+        double leftRearPower = (y - x + rx) / denominator;
+        double rightFrontPower = (y - x - rx) / denominator;
+        double rightRearPower = (y + x - rx) / denominator;
+
+        leftFront.setPower(leftFrontPower);
+        leftRear.setPower(leftRearPower);
+        rightFront.setPower(rightFrontPower);
+        rightRear.setPower(rightRearPower);
     }
 
     @Override
@@ -252,11 +491,44 @@ public class fsmDriveMode extends OpMode {
         telemetry.update();
         follower.startTeleopDrive();
         initializeRobot();
+
+
+        Constants.setConstants(FConstants.class, LConstants.class);
+
+
+        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
+        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
+        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
+        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+        leftFront.setDirection(leftFrontMotorDirection);
+        leftRear.setDirection(leftRearMotorDirection);
+        rightFront.setDirection(rightFrontMotorDirection);
+        rightRear.setDirection(rightRearMotorDirection);
+
+        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
+
+        for (DcMotorEx motor : motors) {
+            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
+            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
+            motor.setMotorType(motorConfigurationType);
+        }
+
+        for (DcMotorEx motor : motors) {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+
     }
 
     @Override
     public void loop() {
+        telemetry.addData("valoare glisiera", robot.intake.intakeMotor.getCurrentPosition());
+        telemetry.addData("State", intakeState);
+        telemetry.addData("outtake motor 1", robot.outtake.outtakeMotor.getCurrentPosition());
+        telemetry.addData("outtake motor 2", robot.outtake.outtakeMotor2.getCurrentPosition());
+        telemetry.addData("outtake sensor", robot.outtake.outtakeSensor.isPressed());
+
         switch (intakeState) {
+
             case INTAKE_START:
                 handleIntakeStart();
                 break;
@@ -266,8 +538,8 @@ public class fsmDriveMode extends OpMode {
             case INTAKE_CLAW_COLLECT_POSITION:
                 handleIntakeClawCollectPosition();
                 break;
-            case INTAKE_RETRACT:
-                handleIntakeRetract();
+            case TRANSFER:
+                handleTransfer();
                 break;
             case OUTTAKE_MID:
                 handleOuttakeMid();
@@ -281,6 +553,9 @@ public class fsmDriveMode extends OpMode {
             case OUTTAKE_SAMPLE:
                 handleOuttakeSample();
                 break;
+            case ASCENT:
+                handleAscent();
+                break;
             default:
                 intakeState = IntakeState.INTAKE_START;
                 break;
@@ -290,5 +565,11 @@ public class fsmDriveMode extends OpMode {
         }
         else updateFollower(1);
         telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+        robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
     }
 }
