@@ -27,30 +27,19 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 import java.util.List;
 
 @Autonomous(name = "SPECIMEN", group = "0. Autonomous")
 public class ClipSpecimenOnBar extends OpMode {
 
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
+    private Robot robot = null;
     private Follower follower;
     private Timer stateTimer, pathTimer, transferTimer;
     private boolean singleton = true;
     private boolean singleton2 = true;
     private boolean singleton3 = true;
-    private boolean singleton4 = true;
-    private boolean transfersingleton1 = true;
-    private boolean transfersingleton2 = true;
-    private boolean transfersingleton3 = true;
-    private boolean transfersingleton4 = true;
-    private boolean transfersingleton5 = true;
-    private boolean transfersingleton6 = true;
-    private boolean transfersingleton7 = true;
-    private boolean isSpecimeninClaw = false;
-    private boolean isTransferDone = false;
-    private boolean isPressed = false;
     private int pathState;
 
     private DcMotorEx leftFront;
@@ -67,7 +56,7 @@ public class ClipSpecimenOnBar extends OpMode {
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
     private final Pose specimenPickup1 = new Pose(20.1, 29, Math.toRadians(180));
-    private final Pose barCliponPose1 = new Pose(36.785,65, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(35.75,65, Math.toRadians(180));
     private final Pose barCliponPose2 = new Pose(36.5,72.5, Math.toRadians(180));
     private final Pose barCliponPose3 = new Pose(36.5, 76.5, Math.toRadians(180));
     private final Pose barCliponPose4 = new Pose(36.7, 81.5, Math.toRadians(180));
@@ -179,13 +168,6 @@ public class ClipSpecimenOnBar extends OpMode {
         singleton = true;
         singleton2 = true;
         singleton3 = true;
-        transfersingleton1 = true;
-        transfersingleton2 = true;
-        transfersingleton3 = true;
-        transfersingleton4 = true;
-        transfersingleton5 = true;
-        transfersingleton6 = true;
-        transfersingleton7 = true;
     }
 
     public void autonomousUpdate() {
@@ -437,7 +419,7 @@ public class ClipSpecimenOnBar extends OpMode {
 
         Constants.setConstants(FConstants.class, LConstants.class);
 
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
         follower = new Follower(hardwareMap);
 
         stateTimer = new Timer();

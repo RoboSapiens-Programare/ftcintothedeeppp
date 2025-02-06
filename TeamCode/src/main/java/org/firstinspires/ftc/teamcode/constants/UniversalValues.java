@@ -14,9 +14,9 @@ public class UniversalValues {
     // TODO: check actual value for *_LOOSE and INTAKE_TRANSFER
     public static double INTAKE_TRANSFER = 0.937;
 
-    public static double CLAW_CLOSE = 0.22;
-    public static double CLAW_LOOSE = 0.311;
-    public static double CLAW_OPEN = 0.55;
+    public static double CLAW_CLOSE = 0.05;
+    public static double CLAW_LOOSE = 0.123;
+    public static double CLAW_OPEN = 0.4;
 
     public static double CLAW_VERTICAL = 0.4;
     public static double CLAW_HORIZONTAL = 0.72;
@@ -30,9 +30,9 @@ public class UniversalValues {
     // TODO: review actual position
     public static double OUTTAKE_GRAB_BAR = 1;
 
-    public static double OUTTAKE_OPEN = 0.55;
+    public static double OUTTAKE_OPEN = 0.3;
     public static double OUTTAKE_OPEN_BAR = 0.60;
-    public static double OUTTAKE_CLOSE = 0.38;
+    public static double OUTTAKE_CLOSE = 0.47;
 
     // outtake values for clipping on specimen
 

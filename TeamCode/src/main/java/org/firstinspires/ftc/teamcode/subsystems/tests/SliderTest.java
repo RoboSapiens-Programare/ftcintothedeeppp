@@ -6,18 +6,18 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Disabled
 @Autonomous(name = "Slider Test", group = "Subsystem Tests")
 public class SliderTest extends OpMode {
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot;
+    private Robot robot;
     private Timer timer = new Timer();
     private int step = 0;
 
     @Override
     public void init() {
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
 
         robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT,1);
         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);

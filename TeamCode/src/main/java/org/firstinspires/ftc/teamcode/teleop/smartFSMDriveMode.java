@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 /* THIS IS EXACTLY THE CODE FROM FSM DRIVE MODE
  *  It simply adds an autonomous path when DRIVER #1 presses CIRCLE after PICKING UP the sample
@@ -65,7 +65,7 @@ public class smartFSMDriveMode extends OpMode {
     private final Pose observationZoneWait = new Pose(30, 12, Math.toRadians(180));
     private PathChain toObservationZonePath, retreat;
 
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot;
+    private Robot robot;
     private Follower follower;
     private boolean isHorizontal = true;
     private boolean isStarted = true;
@@ -365,7 +365,7 @@ public class smartFSMDriveMode extends OpMode {
 
     @Override
     public void init() {
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
 
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);

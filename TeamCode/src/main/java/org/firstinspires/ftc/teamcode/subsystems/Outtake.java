@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-public class outtake {
+public class Outtake {
     public Servo pivotOut1, pivotOut2, outtake;
 //    public DistanceSensor outtakeSensor;
     public DcMotorEx outtakeMotor, outtakeMotor2;
 
     public TouchSensor outtakeSensor;
 
-    public outtake(HardwareMap hardwareMap){
+    public Outtake(HardwareMap hardwareMap){
         pivotOut1 = hardwareMap.get(Servo.class, "pivotOut1");
         pivotOut2 = hardwareMap.get(Servo.class, "pivotOut2");
         outtake = hardwareMap.get(Servo.class, "outtake");

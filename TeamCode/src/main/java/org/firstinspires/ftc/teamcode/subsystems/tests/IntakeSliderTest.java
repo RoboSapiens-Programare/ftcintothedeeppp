@@ -8,12 +8,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Disabled
 @Autonomous(name = "Intake Slider Test", group = "Subsystem Tests")
 public class IntakeSliderTest extends OpMode {
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
+    private Robot robot = null;
 
     private Timer timeoutTimer, actionTimer;
     private boolean singletonExtend, singletonRetract;
@@ -23,7 +23,7 @@ public class IntakeSliderTest extends OpMode {
 
     @Override
     public void init() {
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
 
         timeoutTimer = new Timer();
         actionTimer = new Timer();

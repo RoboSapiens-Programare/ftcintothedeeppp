@@ -2,16 +2,15 @@ package org.firstinspires.ftc.teamcode.subsystems.tests;
 
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Disabled
+//@Disabled
 @Autonomous(name = "Claw Test", group = "Subsystem Tests")
 public class ClawTest extends OpMode {
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot;
+    private Robot robot;
 
     private int step = 0;
 
@@ -19,7 +18,7 @@ public class ClawTest extends OpMode {
 
     @Override
     public void init() {
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
 
         robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT,1);
         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
@@ -31,7 +30,7 @@ public class ClawTest extends OpMode {
 
     @Override
     public void loop() {
-
+        /*
         if (step == 0) {
             robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
             ++step;
@@ -48,8 +47,9 @@ public class ClawTest extends OpMode {
             timer.resetTimer();
             step = 0;
         }
+        */
 
-
-//        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+        robot.intake.OpenIntake(UniversalValues.CLAW_CLOSE);
+        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
     }
 }

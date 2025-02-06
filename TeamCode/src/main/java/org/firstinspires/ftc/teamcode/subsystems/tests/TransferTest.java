@@ -6,17 +6,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Disabled
 @Autonomous(name = "Transfer Test", group = "Subsystem Tests")
 public class TransferTest extends OpMode {
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot;
+    private Robot robot;
     private Timer actionTimer;
 
     @Override
     public void init() {
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
         actionTimer = new Timer();
 
         robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);

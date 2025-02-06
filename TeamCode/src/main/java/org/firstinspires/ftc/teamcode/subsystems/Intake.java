@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-public class intake {
+public class Intake {
     public Servo pivotin, pivotin2, pivotIntake, intake;
 
     public DcMotorEx intakeMotor, intakeMotor2;
@@ -13,7 +13,7 @@ public class intake {
     public TouchSensor intakeLimit;
 
 
-    public intake(HardwareMap hardwareMap) {
+    public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(Servo.class, "intake");
 
         pivotin = hardwareMap.get(Servo.class, "pivotin");
@@ -24,7 +24,7 @@ public class intake {
 
         intakeLimit = hardwareMap.get(TouchSensor.class, "intakeLimit");
 
-        intake.setDirection(Servo.Direction.REVERSE);
+        intake.setDirection(Servo.Direction.FORWARD);
 
         pivotin.setDirection(Servo.Direction.FORWARD);
         pivotin2.setDirection(Servo.Direction.REVERSE);

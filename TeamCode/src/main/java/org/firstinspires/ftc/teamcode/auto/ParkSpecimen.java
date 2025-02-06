@@ -14,12 +14,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
-import org.firstinspires.ftc.teamcode.subsystems.robot;
+import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 @Disabled
 @Autonomous(name = "Auto Push Specimen", group = "Autonomous")
 public class ParkSpecimen extends OpMode {
-    private org.firstinspires.ftc.teamcode.subsystems.robot robot = null;
+    private Robot robot = null;
     private Follower follower;
     private int pathState;
     private final Pose startPose = new Pose(8,49, Math.toRadians(0)); // visualizer: (x: 10 y: 46)
@@ -84,7 +84,7 @@ public class ParkSpecimen extends OpMode {
 
     @Override
     public void init() {
-        robot = new robot(hardwareMap);
+        robot = new Robot(hardwareMap);
 
 
         follower = new Follower(hardwareMap);
