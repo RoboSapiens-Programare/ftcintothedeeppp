@@ -59,24 +59,21 @@ public class fsmDriveMode extends OpMode {
     private final ElapsedTime outtakeTimer = new ElapsedTime();
     private final ElapsedTime speedTimer = new ElapsedTime();
 
-    private boolean isHorizontal = true;
     private boolean isStarted = true;
-    private boolean isPressed = false;
-    private boolean isSquare = false;
-    private boolean isTimer = true;
-    private boolean isMoving = false;
 
     private int ascentStep = 0;
 
     private boolean wallCollect = false;
     private boolean doAscent = false;
-    private boolean notransfer = false;
-    private boolean intakeSliderManip = false;
-    private boolean outtakeSliderManip = false;
+    private boolean noTransfer = false;
+    private boolean isIntakeMoving = false;
+    private boolean isOuttakeMoving = false;
     private boolean intakeFixSingleton = true;
     private boolean outtakeFixSingleton = true;
-    private boolean intakeMoveFixsingleton = true;
+    private boolean intakeMoveFixSingleton = true;
     private boolean fixExtensionSingleton = true;
+
+    private boolean outtakeHoming = false;
 
     private boolean toggleSpeed = false;
 
@@ -114,16 +111,13 @@ public class fsmDriveMode extends OpMode {
         telemetry.addData("INTAKE_RETRACT", INTAKE_RETRACT);
 
         robot.universalTransfer.resetTransfer();
-        if (!intakeSliderManip) {
+        if (!isIntakeMoving) {
             telemetry.addData("RETRACTING INTAKE", "true");
             robot.intake.ManualLevel(INTAKE_RETRACT, 0.5);
         }
-        if (!outtakeSliderManip) {
+        if (!isOuttakeMoving && !outtakeHoming) {
             robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
         }
-        isPressed = false;
-        isSquare = false;
-        isMoving = false;
         if (isStarted) {
             robot.intake.setPivot(INTAKE_INT);
             robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
@@ -132,7 +126,7 @@ public class fsmDriveMode extends OpMode {
         if (gamepad1.right_trigger > 0.1) {
             robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
             intakeState = IntakeState.INTAKE_EXTEND;
-            notransfer = true;
+            noTransfer = true;
         }
         if (gamepad2.triangle) {
             robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 0.75);
@@ -145,21 +139,20 @@ public class fsmDriveMode extends OpMode {
             intakeState = IntakeState.OUTTAKE_SAMPLE;
         }
 
-        if (gamepad2.dpad_left) {
+        if (gamepad2.dpad_left || !intakeFixSingleton) {
             if (robot.intake.intakeLimit.isPressed()) {
                 INTAKE_RETRACT = robot.intake.intakeMotor.getCurrentPosition();
                 INTAKE_EXTEND = INTAKE_RETRACT + 290;
-                intakeSliderManip = false;
+                isIntakeMoving = false;
                 robot.intake.ManualLevel(INTAKE_RETRACT,0.8);
                 intakeFixSingleton = false;
                 robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition());
-                telemetry.addData("pijdakl", robot.intake.intakeLimit.isPressed());
             }
 
-            if (!intakeSliderManip && !robot.intake.intakeLimit.isPressed() && intakeFixSingleton) {
+            if (!isIntakeMoving && !robot.intake.intakeLimit.isPressed() && intakeFixSingleton) {
                 robot.intake.intakeMotor.setPower(-0.2);
                 robot.intake.intakeMotor.setTargetPosition(robot.intake.intakeMotor.getCurrentPosition() - 1000);
-                intakeSliderManip = true;
+                isIntakeMoving = true;
             }
         }
 
@@ -194,7 +187,7 @@ public class fsmDriveMode extends OpMode {
         adjustClawPivot();
         adjustClawPosition();
 
-        if (gamepad1.left_trigger > 0.1 && !notransfer) {
+        if (gamepad1.left_trigger > 0.1 && !noTransfer) {
             robot.intake.setClawPivot(0.6);
             clawPivot = 0.6;
 
@@ -208,7 +201,7 @@ public class fsmDriveMode extends OpMode {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
             wallCollect = true;
-            notransfer = false;
+            noTransfer = false;
         }
         if (gamepad1.triangle) {
             robot.intake.setPivot(INTAKE_TRANSFER);
@@ -217,7 +210,7 @@ public class fsmDriveMode extends OpMode {
     }
 
     private void handleIntakeExtend() {
-        if (abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 10) {
+        if (abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 50) {
             robot.intake.setPivot(INTAKE_DOWN);
             wallCollect = false;
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
@@ -244,42 +237,49 @@ public class fsmDriveMode extends OpMode {
         if (gamepad1.dpad_down) {
             robot.intake.setClawPivot(CLAW_VERTICAL);
             clawPivot = CLAW_VERTICAL;
-            isHorizontal = false;
         } else if (gamepad1.dpad_up) {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            isHorizontal = true;
         }
     }
 
     private void handleIntakeClawCollectPosition() {
         telemetry.addData("fixExtensionSingleton", fixExtensionSingleton);
         telemetry.addData("intakeTimer", intakeTimer.seconds());
+
+        if (gamepad2.left_bumper) {
+            robot.outtake.setPivot(OUTTAKE_GRAB_BAR);
+            robot.outtake.ManualLevel(OUTTAKE_EXTEND_ASCENT_INTERMEDIARY, 0.8);
+
+            intakeState = IntakeState.ASCENT;
+        }
+
         if (gamepad1.left_bumper) {
 //            if (wallCollect)
 //                robot.intake.ManualLevel(INTAKE_EXTEND-50, 0.8);
             robot.intake.CloseIntake(CLAW_CLOSE);
-            intakeMoveFixsingleton = true;
+            intakeMoveFixSingleton = true;
 
-        } else if (gamepad1.right_bumper || !intakeMoveFixsingleton) {
+        } else if (gamepad1.right_bumper || !intakeMoveFixSingleton) {
 
-            intakeMoveFixsingleton = false;
-            if (wallCollect)
+            intakeMoveFixSingleton = false;
+            if (wallCollect) {
                 robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+            }
 
             if (intakeTimer.seconds() > 0.25 || !wallCollect) {
                 robot.intake.CloseIntake(CLAW_OPEN);
-                intakeMoveFixsingleton = true;
+                intakeMoveFixSingleton = true;
             }
 
-        } else if (intakeMoveFixsingleton && fixExtensionSingleton) {
+        } else if (intakeMoveFixSingleton && fixExtensionSingleton) {
             intakeTimer.reset();
         }
 
         adjustClawPivot();
         adjustClawPosition();
 
-        if (gamepad1.left_trigger > 0.1 && !notransfer) {
+        if (gamepad1.left_trigger > 0.1 && !noTransfer) {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
 
@@ -306,7 +306,7 @@ public class fsmDriveMode extends OpMode {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
             wallCollect = true;
-            notransfer = false;
+            noTransfer = false;
         }
         if (gamepad1.triangle) {
             robot.intake.setPivot(INTAKE_TRANSFER);
@@ -375,23 +375,9 @@ public class fsmDriveMode extends OpMode {
 
             robot.outtake.outtakeMotor.setPower(0.4);
             robot.outtake.outtakeMotor2.setPower(0.4);
-        }
-        if (robot.outtake.outtakeSensor.isPressed()) {
-            robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            OUTTAKE_RETRACT = -15;
-            OUTTAKE_EXTEND_MID = OUTTAKE_RETRACT -1770;
-            OUTTAKE_EXTEND_GRAB = OUTTAKE_RETRACT -1584;
-            OUTTAKE_ASCENT = OUTTAKE_RETRACT -754;
-            OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_RETRACT -550;
-            OUTTAKE_EXTEND = OUTTAKE_RETRACT -1770;
-            OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = OUTTAKE_RETRACT -1000;
-
-            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+            outtakeHoming = true;
             intakeState = IntakeState.INTAKE_START;
-
-            outtakeFixSingleton = true;
         }
     }
 
@@ -445,6 +431,26 @@ public class fsmDriveMode extends OpMode {
         }
     }
 
+    private void outtakeHomingCheck() {
+        if (robot.outtake.outtakeSensor.isPressed() && outtakeHoming) {
+            robot.outtake.outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.outtake.outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            OUTTAKE_RETRACT = -15;
+            OUTTAKE_EXTEND_MID = OUTTAKE_RETRACT -1770;
+            OUTTAKE_EXTEND_GRAB = OUTTAKE_RETRACT -1584;
+            OUTTAKE_ASCENT = OUTTAKE_RETRACT -754;
+            OUTTAKE_EXTEND_SPECIMEN = OUTTAKE_RETRACT -550;
+            OUTTAKE_EXTEND = OUTTAKE_RETRACT -1770;
+            OUTTAKE_EXTEND_ASCENT_INTERMEDIARY = OUTTAKE_RETRACT -1000;
+
+            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+
+            outtakeHoming = false;
+            outtakeFixSingleton = true;
+        }
+    }
+
     private void updateFollower(double power) {
         double y = -gamepad1.left_stick_y*power; // Remember, this is reversed!
         double x = gamepad1.left_stick_x*power; // this is strafing
@@ -476,7 +482,7 @@ public class fsmDriveMode extends OpMode {
         follower.startTeleopDrive();
         initializeRobot();
 
-
+        
         Constants.setConstants(FConstants.class, LConstants.class);
 
 
@@ -506,16 +512,19 @@ public class fsmDriveMode extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("valoare glisiera", robot.intake.intakeMotor.getCurrentPosition());
+        telemetry.addData("0. SLOW MODE", toggleSpeed);
+        telemetry.addData("intake  expansion", robot.intake.intakeMotor.getCurrentPosition());
+        telemetry.addData("outtake expansion", robot.outtake.outtakeMotor.getCurrentPosition());
         telemetry.addData("State", intakeState);
-        telemetry.addData("outtake motor 1", robot.outtake.outtakeMotor.getCurrentPosition());
-        telemetry.addData("outtake motor 2", robot.outtake.outtakeMotor2.getCurrentPosition());
         telemetry.addData("outtake sensor", robot.outtake.outtakeSensor.isPressed());
+        telemetry.addData("intake sensor", robot.intake.intakeLimit.isPressed());
 
-        if (speedTimer.seconds() > 0.5 && gamepad1.guide) {
+        if (speedTimer.seconds() > 0.5 && gamepad1.touchpad) {
             speedTimer.reset();
             toggleSpeed = !toggleSpeed;
         }
+
+        outtakeHomingCheck();
 
         switch (intakeState) {
 

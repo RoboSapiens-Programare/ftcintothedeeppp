@@ -64,10 +64,10 @@ public class BucketAuto extends OpMode {
 
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 107.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose scorePose = new Pose(15.750 + OFFSET_X, 126.250 + OFFSET_Y, Math.toRadians(-45));
-    private final Pose grabFirstSamplePose = new Pose(28.700 + OFFSET_X, 128.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(28.700 + OFFSET_X, 117.000 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabThirdSamplePose = new Pose(32.250 + OFFSET_X, 127.000 + OFFSET_Y, Math.toRadians(35));
-    private final Pose parkPose = new Pose(62.000 + OFFSET_X, 97.000 + OFFSET_Y, Math.toRadians(90));
+    private final Pose grabFirstSamplePose = new Pose(30.700 + OFFSET_X, 128 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabSecodSamplePose = new Pose(30.200 + OFFSET_X, 117.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabThirdSamplePose = new Pose(34.5 + OFFSET_X, 127.800 + OFFSET_Y, Math.toRadians(35));
+    private final Pose parkPose = new Pose(62.500 + OFFSET_X, 94.000 + OFFSET_Y, Math.toRadians(90));
 
 
     private PathChain scorePreload, grabFirstSample, scoreFirstSample, grabSecondSample, scoreSecondSample, grabThirdSample, scoreThirdSample, park;
@@ -76,7 +76,13 @@ public class BucketAuto extends OpMode {
         // TODO : fix Linear Heading Interpolation for rotation to the right without hard coding value bigger than 180 (line 37)
         scorePreload = follower.pathBuilder()
                 .addPath(
-                        new BezierLine( new Point(startPose), new Point(scorePose) )
+                        new BezierLine( new Point(startPose), new Point(startPose.getX()+2, startPose.getY()) )
+                )
+                .setLinearHeadingInterpolation(
+                        startPose.getHeading(), startPose.getHeading()
+                )
+                .addPath(
+                        new BezierLine( new Point(startPose.getX()+2, startPose.getY()), new Point(scorePose) )
                 )
                 .setLinearHeadingInterpolation(
                         startPose.getHeading(), scorePose.getHeading()
@@ -465,9 +471,9 @@ public class BucketAuto extends OpMode {
         robot.intake.ManualLevel(INTAKE_RETRACT, 1);
         robot.intake.CloseIntake(CLAW_OPEN);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
-        robot.intake.setPivot(INTAKE_INIT);
+        robot.intake.setPivot(INTAKE_INIT-0.1);
         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-        robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
+        robot.outtake.CloseOuttake(OUTTAKE_OPEN);
 
         telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
@@ -519,6 +525,8 @@ public class BucketAuto extends OpMode {
     public void start() {
         autoTimer.resetTimer();
         setPathState(0);
+
+        robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
     }
 
     @Override

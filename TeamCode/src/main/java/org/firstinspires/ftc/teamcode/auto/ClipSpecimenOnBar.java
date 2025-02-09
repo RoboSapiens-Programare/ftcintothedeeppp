@@ -56,10 +56,10 @@ public class ClipSpecimenOnBar extends OpMode {
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
     private final Pose specimenPickup1 = new Pose(20.1, 29, Math.toRadians(180));
-    private final Pose barCliponPose1 = new Pose(35.75,65, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(36.5,72.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(36.5, 76.5, Math.toRadians(180));
-    private final Pose barCliponPose4 = new Pose(36.7, 81.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(35.75,67.5, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(36.5,74.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(36.5, 78.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(36.7, 83.5, Math.toRadians(180));
     private final Pose ParkPose = new Pose(2,32, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
     private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
@@ -431,9 +431,9 @@ public class ClipSpecimenOnBar extends OpMode {
         robot.intake.ManualLevel(INTAKE_RETRACT, 1);
         robot.intake.CloseIntake(CLAW_OPEN);
         robot.intake.setClawPivot(CLAW_HORIZONTAL);
-        robot.intake.setPivot(INTAKE_INIT);
+        robot.intake.setPivot(INTAKE_INIT-0.1);
         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-        robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
+        robot.outtake.CloseOuttake(OUTTAKE_OPEN);
 
         telemetry.update();
         buildPaths();
@@ -460,13 +460,14 @@ public class ClipSpecimenOnBar extends OpMode {
         }
         autonomousUpdate();
 
-        telemetry.addData("path state", pathState);
+          telemetry.addData("path state", pathState);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
 
     }
+
 
     @Override
     public void init_loop() {
@@ -480,6 +481,7 @@ public class ClipSpecimenOnBar extends OpMode {
     @Override
     public void start() {
         setPathState(0);
+        robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
     }
 
     @Override

@@ -8,7 +8,7 @@ public class UniversalValues {
     public static double INTAKE_UP = 0.73;
     public static double INTAKE_DOWN = 0.14;
     public static double INTAKE_INT = 0.5;
-    public static double INTAKE_INIT = 0.84;
+    public static double INTAKE_INIT = 0.937;
 
     // PIVOT position for when the sample is to be transferred
     // TODO: check actual value for *_LOOSE and INTAKE_TRANSFER
@@ -23,7 +23,7 @@ public class UniversalValues {
     public static double CLAW_FLIPPED = 0.08;
 
     public static double OUTTAKE_DUMP_BUCKET = 0.71;
-    public static double OUTTAKE_DUMP_BUCKET_DIAG = 0.8;
+    public static double OUTTAKE_DUMP_BUCKET_DIAG = 0.78;
     public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.36875;
     public static double OUTTAKE_COLLECT = 0.04;
 
