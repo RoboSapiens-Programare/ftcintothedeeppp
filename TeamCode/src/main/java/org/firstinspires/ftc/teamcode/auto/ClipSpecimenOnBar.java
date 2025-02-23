@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 import java.util.List;
 
-@Autonomous(name = "SPECIMEN", group = "0. Autonomous")
+@Autonomous(name = "4+0", group = "0. Autonomous")
 public class ClipSpecimenOnBar extends OpMode {
 
     private Robot robot = null;
