@@ -57,98 +57,94 @@ public class FivePlusZero extends OpMode {
     private final Pose barCliponPose4 = new Pose(36.7, 78.5, Math.toRadians(180));
     private final Pose barCliponPose5 = new Pose(36.7, 80.5, Math.toRadians(180));
 
-    private final Pose samplePickup = new Pose(27.5, 13.1);
+    private final Pose samplePickup1 = new Pose(28.7, 35.2);
+    private final Pose sampleDropOff1 = new Pose(28.7, 30.7);
+    private final Pose samplePickup2 = new Pose(28.7, 26.2);
+    private final Pose sampleDropOff2 = new Pose(28.7, 21.7);
+    private final Pose samplePickup3 = new Pose(28.7, 17.2);
+//    private final Pose sampleDropOff3 = new Pose(28.7, 21.7);
+
 
     private final Pose specimenPickup = new Pose(20.1, 24, Math.toRadians(180));
 
     private final Pose ParkPose = new Pose(15,27, Math.toRadians(180));
 
 
-    private PathChain line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12, line13, line14, line15, line16;
+    private PathChain line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12, line13, line14, line15;
 
     public void buildPaths() {
 
             line1 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(8.536, 44.000, Point.CARTESIAN),
+                                    new Point(8.500, 44.000, Point.CARTESIAN),
                                     new Point(35.750, 62.500, Point.CARTESIAN)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
             line2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(35.750, 62.500, Point.CARTESIAN),
-                                    new Point(27.500, 13.100, Point.CARTESIAN)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(45))
-                    .build();
-
-            line3 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(27.500, 13.100, Point.CARTESIAN),
-                                    new Point(27.500, 13.100, Point.CARTESIAN)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(180))
-                    .build();
-
-            line4 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(27.500, 13.100, Point.CARTESIAN),
-                                    new Point(27.500, 13.100, Point.CARTESIAN)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(0))
-                    .build();
-
-            line5 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(27.500, 13.100, Point.CARTESIAN),
-                                    new Point(27.500, 13.100, Point.CARTESIAN)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
-                    .build();
-
-            line6 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(27.500, 13.100, Point.CARTESIAN),
-                                    new Point(27.500, 13.100, Point.CARTESIAN)
+                                    new Point(28.700, 35.200, Point.CARTESIAN)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-45))
                     .build();
 
+            line3 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Point(28.700, 35.200, Point.CARTESIAN),
+                                    new Point(28.700, 30.700, Point.CARTESIAN)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-135))
+                    .build();
+
+            line4 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Point(28.700, 30.700, Point.CARTESIAN),
+                                    new Point(28.700, 26.200, Point.CARTESIAN)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(-135), Math.toRadians(-45))
+                    .build();
+
+            line5 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Point(28.700, 26.200, Point.CARTESIAN),
+                                    new Point(28.700, 21.700, Point.CARTESIAN)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-135))
+                    .build();
+
+            line6 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Point(28.700, 21.700, Point.CARTESIAN),
+                                    new Point(28.700, 17.200, Point.CARTESIAN)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(-135), Math.toRadians(-45))
+                    .build();
+
             line7 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(27.500, 13.100, Point.CARTESIAN),
-                                    new Point(27.500, 13.100, Point.CARTESIAN)
+                                    new Point(28.700, 17.200, Point.CARTESIAN),
+                                    new Point(20.100, 24.000, Point.CARTESIAN)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(180))
                     .build();
 
             line8 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(27.500, 13.100, Point.CARTESIAN),
-                                    new Point(20.100, 24.000, Point.CARTESIAN)
-                            )
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
-                    .build();
-
-            line9 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(20.100, 24.000, Point.CARTESIAN),
@@ -158,7 +154,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line10 = follower.pathBuilder()
+            line9 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(36.500, 69.500, Point.CARTESIAN),
@@ -168,7 +164,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line11 = follower.pathBuilder()
+            line10 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(20.100, 24.000, Point.CARTESIAN),
@@ -178,7 +174,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line12 = follower.pathBuilder()
+            line11 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(36.500, 73.500, Point.CARTESIAN),
@@ -188,7 +184,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line13 = follower.pathBuilder()
+            line12 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(20.100, 24.000, Point.CARTESIAN),
@@ -198,7 +194,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line14 = follower.pathBuilder()
+            line13 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(36.700, 78.500, Point.CARTESIAN),
@@ -208,7 +204,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line15 = follower.pathBuilder()
+            line14 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(20.100, 24.000, Point.CARTESIAN),
@@ -218,7 +214,7 @@ public class FivePlusZero extends OpMode {
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
-            line16 = follower.pathBuilder()
+            line15 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Point(36.700, 80.500, Point.CARTESIAN),
@@ -244,102 +240,157 @@ public class FivePlusZero extends OpMode {
     public void autonomousUpdate() {
         switch(pathState) {
             case(0):
-                follower.followPath(line1,true);
+                if (singleton)
+                {
+                    follower.followPath(line1,true);
+                    singleton = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(1);
                 }
                 break;
             case(1):
-                follower.followPath(line2,true);
+                if (singleton2)
+                {
+                    follower.followPath(line2,true);
+                    singleton2 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(2);
                 }
                 break;
             case(2):
-                follower.followPath(line3,true);
+                if (singleton3)
+                {
+                    singleton3 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(3);
                 }
                 break;
             case(3):
-                follower.followPath(line4,true);
+                if (singleton)
+                {
+                    follower.followPath(line4,true);
+                    singleton = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(4);
                 }
                 break;
             case(4):
-                follower.followPath(line5,true);
+                if (singleton2)
+                {
+                    follower.followPath(line5,true);
+                    singleton2 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(5);
                 }
                 break;
             case(5):
-                follower.followPath(line6,true);
+                if (singleton3)
+                {
+                    follower.followPath(line6,true);
+                    singleton3 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(6);
                 }
                 break;
             case(6):
-                follower.followPath(line7,true);
+                if (singleton)
+                {
+                    follower.followPath(line7,true);
+                    singleton = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(7);
                 }
                 break;
             case(7):
-                follower.followPath(line8,true);
+                if (singleton2)
+                {
+                    follower.followPath(line8,true);
+                    singleton2 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(8);
                 }
                 break;
             case(8):
-                follower.followPath(line9,true);
+                if (singleton3)
+                {
+                    follower.followPath(line9,true);
+                    singleton3 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(9);
                 }
                 break;
             case(9):
-                follower.followPath(line10,true);
+                if (singleton)
+                {
+                    follower.followPath(line10,true);
+                    singleton = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(10);
                 }
                 break;
             case(10):
-                follower.followPath(line11,true);
+                if (singleton2)
+                {
+                    follower.followPath(line11,true);
+                    singleton2 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(11);
                 }
                 break;
             case(11):
-                follower.followPath(line12,true);
+                if (singleton3)
+                {
+                    follower.followPath(line12,true);
+                    singleton3 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(12);
                 }
                 break;
             case(12):
-                follower.followPath(line13,true);
+                if (singleton)
+                {
+                    follower.followPath(line13,true);
+                    singleton = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(13);
                 }
                 break;
             case(13):
-                follower.followPath(line14,true);
+                if (singleton2)
+                {
+                    follower.followPath(line14,true);
+                    singleton2 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(14);
                 }
                 break;
             case(14):
-                follower.followPath(line15,true);
+                if (singleton3)
+                {
+                    follower.followPath(line15,true);
+                    singleton3 = false;
+                }
                 if (!follower.isBusy()) {
                     setPathState(15);
                 }
                 break;
             case(15):
-                follower.followPath(line16,true);
-                if (!follower.isBusy()) {
-                    setPathState(16);
-                }
+                setPathState(-1);
                 break;
-
         }
     }
 
