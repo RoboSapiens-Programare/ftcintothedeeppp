@@ -134,18 +134,3 @@ public class UniversalTransfer {
 
     public boolean isSamplePickedUp() { return samplePickedUp; }
 }
-
-
-
-
-/* USAGE:
- * public void loop() {
- *     ...
- *     robot.transfer();
- *
- *     while (!isTransferCompleted())
- *         return; // or any kind of skip
- *     resetTransfer();
- *     ...
- * }
- */

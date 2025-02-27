@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
@@ -243,6 +244,7 @@ public class FivePlusZero extends OpMode {
                 if (singleton)
                 {
                     follower.followPath(line1,true);
+                    robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
                     singleton = false;
                 }
                 if (!follower.isBusy()) {
@@ -256,15 +258,35 @@ public class FivePlusZero extends OpMode {
                     singleton2 = false;
                 }
                 if (!follower.isBusy()) {
-                    setPathState(2);
+                    if (singleton)
+                    {
+                        stateTimer.resetTimer();
+                        singleton = false;
+                    }
+                    robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+                    if (stateTimer.getElapsedTimeSeconds()>0.3)
+                    {
+                        robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                        if (stateTimer.getElapsedTimeSeconds()>0.6)
+                        {
+                            robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                            robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                            setPathState(2);
+                        }
+                    }
                 }
                 break;
             case(2):
                 if (singleton3)
                 {
+                    follower.followPath(line3,true);
+                    robot.intake.ManualLevel(INTAKE_EXTEND/2, 0.8);
+                    robot.intake.OpenIntake(CLAW_OPEN);
+
                     singleton3 = false;
                 }
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(3);
                 }
                 break;
@@ -272,9 +294,11 @@ public class FivePlusZero extends OpMode {
                 if (singleton)
                 {
                     follower.followPath(line4,true);
+                    robot.intake.OpenIntake(CLAW_CLOSE);
+
                     singleton = false;
                 }
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(4);
                 }
                 break;
@@ -282,9 +306,11 @@ public class FivePlusZero extends OpMode {
                 if (singleton2)
                 {
                     follower.followPath(line5,true);
+                    robot.intake.OpenIntake(CLAW_OPEN);
+
                     singleton2 = false;
                 }
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(5);
                 }
                 break;
@@ -292,50 +318,170 @@ public class FivePlusZero extends OpMode {
                 if (singleton3)
                 {
                     follower.followPath(line6,true);
+                    robot.intake.OpenIntake(CLAW_CLOSE);
+
                     singleton3 = false;
                 }
-                if (!follower.isBusy()) {
+                if (stateTimer.getElapsedTimeSeconds() > 1)
+                {
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+                }
+
+                if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(6);
                 }
                 break;
             case(6):
-                if (singleton)
+                if (singleton2)
                 {
                     follower.followPath(line7,true);
-                    singleton = false;
+                    robot.intake.OpenIntake(CLAW_OPEN);
+
+
+                    singleton2 = false;
                 }
-                if (!follower.isBusy()) {
-                    setPathState(7);
+                if (stateTimer.getElapsedTimeSeconds()>1.5)
+                {
+                    robot.intake.setPivot(UniversalValues.INTAKE_INIT);
+                }
+                if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>3 || !singleton) {
+
+                    if (singleton3)
+                    {
+                        stateTimer.resetTimer();
+                        singleton3 = false;
+                    }
+
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                    robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
+
+                    if (singleton)
+                    {
+                        stateTimer.resetTimer();
+                        singleton = false;
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7)
+                    {
+                        singleton3 = false;
+                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 2.1)
+                    {
+                        robot.intake.OpenIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                            robot.intake.setClawPivot(0.6);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
+
+                            follower.followPath(line7, true);
+                            setPathState(7);
+                            // starts cycling
+                        }
+                    }
                 }
                 break;
+
+                // TODO: verify everything up until state 7
+
             case(7):
+                robot.universalTransfer.transfer();
                 if (singleton2)
                 {
                     follower.followPath(line8,true);
                     singleton2 = false;
                 }
                 if (!follower.isBusy()) {
-                    setPathState(8);
+                    if (robot.universalTransfer.isTransferCompleted()) {
+                        if (singleton2)
+                        {
+                            stateTimer.resetTimer();
+                            singleton2 = false;
+                        }
+
+                        if (stateTimer.getElapsedTimeSeconds() > 0.75) {
+                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+                            if (stateTimer.getElapsedTimeSeconds() > 1) {
+                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                                if (stateTimer.getElapsedTimeSeconds() > 1.15) {
+                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                                    robot.universalTransfer.resetTransfer();
+                                    setPathState(8);
+                                }
+                            }
+                        }
+                    }
                 }
                 break;
             case(8):
-                if (singleton3)
+                if (singleton2)
                 {
                     follower.followPath(line9,true);
-                    singleton3 = false;
+                    singleton2 = false;
                 }
-                if (!follower.isBusy()) {
-                    setPathState(9);
+
+                if (!follower.isBusy() || !singleton) {
+
+                    if (singleton3)
+                    {
+                        stateTimer.resetTimer();
+                        singleton3 = false;
+                    }
+
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                    robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
+
+                    if (singleton)
+                    {
+                        stateTimer.resetTimer();
+                        singleton = false;
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7)
+                    {
+                        singleton3 = false;
+                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 2.1)
+                    {
+                        robot.intake.OpenIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                            robot.intake.setClawPivot(0.6);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
+
+                            setPathState(9);
+                        }
+                    }
                 }
                 break;
             case(9):
-                if (singleton)
+                robot.universalTransfer.transfer();
+                if (singleton2)
                 {
                     follower.followPath(line10,true);
-                    singleton = false;
+                    singleton2 = false;
                 }
                 if (!follower.isBusy()) {
-                    setPathState(10);
+                    if (robot.universalTransfer.isTransferCompleted()) {
+                        if (singleton2)
+                        {
+                            stateTimer.resetTimer();
+                            singleton2 = false;
+                        }
+
+                        if (stateTimer.getElapsedTimeSeconds() > 0.75) {
+                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+                            if (stateTimer.getElapsedTimeSeconds() > 1) {
+                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                                if (stateTimer.getElapsedTimeSeconds() > 1.15) {
+                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                                    robot.universalTransfer.resetTransfer();
+                                    setPathState(10);
+                                }
+                            }
+                        }
+                    }
                 }
                 break;
             case(10):
@@ -344,38 +490,140 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line11,true);
                     singleton2 = false;
                 }
-                if (!follower.isBusy()) {
-                    setPathState(11);
+
+                if (!follower.isBusy() || !singleton) {
+
+                    if (singleton3)
+                    {
+                        stateTimer.resetTimer();
+                        singleton3 = false;
+                    }
+
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                    robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
+
+                    if (singleton)
+                    {
+                        stateTimer.resetTimer();
+                        singleton = false;
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7)
+                    {
+                        singleton3 = false;
+                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 2.1)
+                    {
+                        robot.intake.OpenIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                            robot.intake.setClawPivot(0.6);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
+
+                            setPathState(11);
+                        }
+                    }
                 }
                 break;
             case(11):
-                if (singleton3)
+                robot.universalTransfer.transfer();
+                if (singleton2)
                 {
                     follower.followPath(line12,true);
-                    singleton3 = false;
+                    singleton2 = false;
                 }
                 if (!follower.isBusy()) {
-                    setPathState(12);
+                    if (robot.universalTransfer.isTransferCompleted()) {
+                        if (singleton2)
+                        {
+                            stateTimer.resetTimer();
+                            singleton2 = false;
+                        }
+
+                        if (stateTimer.getElapsedTimeSeconds() > 0.75) {
+                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+                            if (stateTimer.getElapsedTimeSeconds() > 1) {
+                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                                if (stateTimer.getElapsedTimeSeconds() > 1.15) {
+                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                                    robot.universalTransfer.resetTransfer();
+                                    setPathState(12);
+                                }
+                            }
+                        }
+                    }
                 }
                 break;
             case(12):
-                if (singleton)
+                if (singleton2)
                 {
                     follower.followPath(line13,true);
-                    singleton = false;
+                    singleton2 = false;
                 }
-                if (!follower.isBusy()) {
-                    setPathState(13);
+
+                if (!follower.isBusy() || !singleton) {
+
+                    if (singleton3)
+                    {
+                        stateTimer.resetTimer();
+                        singleton3 = false;
+                    }
+
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                    robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
+
+                    if (singleton)
+                    {
+                        stateTimer.resetTimer();
+                        singleton = false;
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 1.7)
+                    {
+                        singleton3 = false;
+                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                    }
+                    if (stateTimer.getElapsedTimeSeconds() > 2.1)
+                    {
+                        robot.intake.OpenIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                            robot.intake.setClawPivot(0.6);
+                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
+
+                            setPathState(13);
+                        }
+                    }
                 }
                 break;
             case(13):
+                robot.universalTransfer.transfer();
                 if (singleton2)
                 {
                     follower.followPath(line14,true);
                     singleton2 = false;
                 }
                 if (!follower.isBusy()) {
-                    setPathState(14);
+                    if (robot.universalTransfer.isTransferCompleted()) {
+                        if (singleton2)
+                        {
+                            stateTimer.resetTimer();
+                            singleton2 = false;
+                        }
+
+                        if (stateTimer.getElapsedTimeSeconds() > 0.75) {
+                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
+                            if (stateTimer.getElapsedTimeSeconds() > 1) {
+                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                                if (stateTimer.getElapsedTimeSeconds() > 1.15) {
+                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
+                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                                    robot.universalTransfer.resetTransfer();
+                                    setPathState(14);
+                                }
+                            }
+                        }
+                    }
                 }
                 break;
             case(14):
