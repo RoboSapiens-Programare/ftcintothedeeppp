@@ -49,7 +49,7 @@ public class ClawTest extends OpMode {
         }
         */
 
+//        robot.intake.OpenIntake(UniversalValues.CLAW_CLOSE);
         robot.intake.OpenIntake(UniversalValues.CLAW_CLOSE);
-        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
     }
 }

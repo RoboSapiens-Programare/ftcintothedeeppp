@@ -193,7 +193,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds()>0.3)
                     {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                        if (stateTimer.getElapsedTimeSeconds()>0.6)
+                        if (stateTimer.getElapsedTimeSeconds()>0.4)
                         {
                             robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
                             robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
@@ -255,7 +255,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 2.1)
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 2.3) {
+                        if (stateTimer.getElapsedTimeSeconds() > 2.25) {
                             robot.intake.setClawPivot(0.6);
                             robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
