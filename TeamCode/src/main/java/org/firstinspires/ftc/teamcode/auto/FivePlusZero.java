@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_DOWN;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
@@ -38,6 +39,8 @@ import dev.frozenmilk.dairy.core.util.controller.calculation.pid.DoubleComponent
 @Autonomous(name = "5+0", group = "0. Autonomous")
 public class FivePlusZero extends OpMode {
 
+    // TODO fine tune positions and add claw pivot for last pickup
+
     private Robot robot = null;
     private Follower follower;
     private Timer stateTimer, pathTimer, transferTimer;
@@ -54,21 +57,19 @@ public class FivePlusZero extends OpMode {
 
     private final Pose startPose = new Pose(8.5,44, Math.toRadians(180));
 
-    private final Pose barCliponPose1 = new Pose(35.75,62.5, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(36.5,69.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(36.5, 73.5, Math.toRadians(180));
-    private final Pose barCliponPose4 = new Pose(36.7, 78.5, Math.toRadians(180));
-    private final Pose barCliponPose5 = new Pose(36.7, 80.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(35,60.5, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(35,63.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(35, 65.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(35, 67.5, Math.toRadians(180));
+    private final Pose barCliponPose5 = new Pose(35, 69.5, Math.toRadians(180));
 
-    private final Pose samplePickup1 = new Pose(28.7, 35.2);
-    private final Pose sampleDropOff1 = new Pose(28.7, 30.7);
-    private final Pose samplePickup2 = new Pose(28.7, 26.2);
-    private final Pose sampleDropOff2 = new Pose(28.7, 21.7);
-    private final Pose samplePickup3 = new Pose(28.7, 17.2);
+    private final Pose samplePickup1 = new Pose(32.7, 22);
+    private final Pose sampleDropOff1 = new Pose(32.7, 20);
+    private final Pose samplePickup2 = new Pose(32.7, 12);
+    private final Pose sampleDropOff2 = new Pose(32.7, 10);
+    private final Pose samplePickup3 = new Pose(32.7, 9);
 
-    // TODO: add about 1-2 inches to specimen pickup x before adding universal poses
-
-    private final Pose specimenPickup = new Pose(20.1, 24, Math.toRadians(180));
+    private final Pose specimenPickup = new Pose(21.1, 24, Math.toRadians(180));
 
     private final Pose ParkPose = new Pose(15,27, Math.toRadians(180));
 
@@ -77,13 +78,11 @@ public class FivePlusZero extends OpMode {
 
     public void buildPaths() {
 
-        //TODO: add universal poses to paths and rename for best conventions
-
             line1 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(8.500, 44.000, Point.CARTESIAN),
-                                    new Point(35.750, 62.500, Point.CARTESIAN)
+                                    new Point(startPose),
+                                    new Point(barCliponPose1)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -92,68 +91,68 @@ public class FivePlusZero extends OpMode {
             line2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(35.750, 62.500, Point.CARTESIAN),
-                                    new Point(28.700, 35.200, Point.CARTESIAN)
+                                    new Point(barCliponPose1),
+                                    new Point(samplePickup1)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-45))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(0))
                     .build();
 
             line3 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(28.700, 35.200, Point.CARTESIAN),
-                                    new Point(28.700, 30.700, Point.CARTESIAN)
+                                    new Point(samplePickup1),
+                                    new Point(sampleDropOff1)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-135))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
                     .build();
 
             line4 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(28.700, 30.700, Point.CARTESIAN),
-                                    new Point(28.700, 26.200, Point.CARTESIAN)
+                                    new Point(sampleDropOff1),
+                                    new Point(samplePickup2)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(-135), Math.toRadians(-45))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(0))
                     .build();
 
             line5 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(28.700, 26.200, Point.CARTESIAN),
-                                    new Point(28.700, 21.700, Point.CARTESIAN)
+                                    new Point(samplePickup2),
+                                    new Point(sampleDropOff2)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-135))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
                     .build();
 
             line6 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(28.700, 21.700, Point.CARTESIAN),
-                                    new Point(28.700, 17.200, Point.CARTESIAN)
+                                    new Point(sampleDropOff2),
+                                    new Point(samplePickup3)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(-135), Math.toRadians(-45))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-25))
                     .build();
 
             line7 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(28.700, 17.200, Point.CARTESIAN),
-                                    new Point(20.100, 24.000, Point.CARTESIAN)
+                                    new Point(samplePickup3),
+                                    new Point(specimenPickup)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(-25), Math.toRadians(180))
                     .build();
 
             line8 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(20.100, 24.000, Point.CARTESIAN),
-                                    new Point(36.500, 69.500, Point.CARTESIAN)
+                                    new Point(specimenPickup),
+                                    new Point(barCliponPose2)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -162,8 +161,8 @@ public class FivePlusZero extends OpMode {
             line9 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(36.500, 69.500, Point.CARTESIAN),
-                                    new Point(20.100, 24.000, Point.CARTESIAN)
+                                    new Point(barCliponPose2),
+                                    new Point(specimenPickup)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -172,8 +171,8 @@ public class FivePlusZero extends OpMode {
             line10 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(20.100, 24.000, Point.CARTESIAN),
-                                    new Point(36.500, 73.500, Point.CARTESIAN)
+                                    new Point(specimenPickup),
+                                    new Point(barCliponPose3)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -182,8 +181,8 @@ public class FivePlusZero extends OpMode {
             line11 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(36.500, 73.500, Point.CARTESIAN),
-                                    new Point(20.100, 24.000, Point.CARTESIAN)
+                                    new Point(barCliponPose3),
+                                    new Point(specimenPickup)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -192,8 +191,8 @@ public class FivePlusZero extends OpMode {
             line12 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(20.100, 24.000, Point.CARTESIAN),
-                                    new Point(36.700, 78.500, Point.CARTESIAN)
+                                    new Point(specimenPickup),
+                                    new Point(barCliponPose4)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -202,8 +201,8 @@ public class FivePlusZero extends OpMode {
             line13 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(36.700, 78.500, Point.CARTESIAN),
-                                    new Point(20.100, 24.000, Point.CARTESIAN)
+                                    new Point(barCliponPose4),
+                                    new Point(specimenPickup)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -212,8 +211,8 @@ public class FivePlusZero extends OpMode {
             line14 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(20.100, 24.000, Point.CARTESIAN),
-                                    new Point(36.700, 80.500, Point.CARTESIAN)
+                                    new Point(specimenPickup),
+                                    new Point(barCliponPose5)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -222,8 +221,8 @@ public class FivePlusZero extends OpMode {
             line15 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Point(36.700, 80.500, Point.CARTESIAN),
-                                    new Point(15.000, 27.000, Point.CARTESIAN)
+                                    new Point(barCliponPose5),
+                                    new Point(ParkPose)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -278,7 +277,7 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line2,true);
                     robot.intake.OpenIntake(CLAW_OPEN);
                     robot.intake.setPivot(INTAKE_DOWN);
-                    robot.intake.ManualLevel(INTAKE_EXTEND/2, 0.8);
+                    robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                     singleton2 = false;
                 }
 
@@ -290,7 +289,10 @@ public class FivePlusZero extends OpMode {
 
                 if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(2);
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>1) {
+                    robot.intake.setPivot(INTAKE_INT);
+                } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>0.5) {
                     robot.intake.OpenIntake(CLAW_CLOSE);
                 }
                 break;
@@ -300,21 +302,45 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line3,true);
                     singleton3 = false;
                 }
+
+                if (!follower.isBusy() && singleton)
+                {
+                    stateTimer.resetTimer();
+                    singleton = false;
+                }
+
                 if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(3);
+                    robot.intake.setPivot(INTAKE_INT);
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>1) {
                     robot.intake.OpenIntake(CLAW_OPEN);
+                } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>0.5) {
+                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+                    robot.intake.setPivot(INTAKE_DOWN);
                 }
                 break;
             case(3):
-                if (singleton)
+                if (singleton2)
                 {
                     follower.followPath(line4,true);
-                    singleton = false;
+                    singleton2 = false;
                 }
+
+                if (!follower.isBusy() && singleton)
+                {
+                    stateTimer.resetTimer();
+                    singleton = false;
+                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+                    robot.intake.setPivot(INTAKE_DOWN);
+                }
+
                 if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(4);
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>1) {
+                    robot.intake.setPivot(INTAKE_INT);
+                } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>0.5) {
                     robot.intake.OpenIntake(CLAW_CLOSE);
                 }
                 break;
@@ -324,10 +350,22 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line5,true);
                     singleton2 = false;
                 }
+
+                if (!follower.isBusy() && singleton)
+                {
+                    stateTimer.resetTimer();
+                    singleton = false;
+                }
+
                 if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(5);
+                    robot.intake.setPivot(INTAKE_INT);
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>1) {
                     robot.intake.OpenIntake(CLAW_OPEN);
+                } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>0.5) {
+                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+                    robot.intake.setPivot(INTAKE_DOWN);
                 }
                 break;
             case(5):
@@ -335,12 +373,24 @@ public class FivePlusZero extends OpMode {
                 {
                     follower.followPath(line6,true);
                     singleton3 = false;
+                    robot.intake.setPivot(INTAKE_DOWN);
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+                }
+
+                if (!follower.isBusy() && singleton)
+                {
+                    stateTimer.resetTimer();
+                    singleton = false;
                 }
 
                 if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>2) {
                     setPathState(6);
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
                 } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>1) {
                     robot.intake.OpenIntake(CLAW_CLOSE);
+                } else if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>0.5) {
+                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+
                 }
                 break;
             case(6):
@@ -353,6 +403,7 @@ public class FivePlusZero extends OpMode {
                 if (!follower.isBusy() && singleton4)
                 {
                     stateTimer.resetTimer();
+                    robot.intake.ManualLevel(INTAKE_EXTEND/2, 1);
                     singleton4 = false;
                 }
 
@@ -360,35 +411,27 @@ public class FivePlusZero extends OpMode {
                 {
                     robot.intake.setPivot(INTAKE_DOWN);
                     robot.intake.OpenIntake(CLAW_OPEN);
+                } else if (stateTimer.getElapsedTimeSeconds()>2.5 && stateTimer.getElapsedTimeSeconds()<2.51 && singleton) {
+                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
                 }
+
+
                 if (!follower.isBusy() && stateTimer.getElapsedTimeSeconds()>3 || !singleton) {
-
-                    if (singleton3)
-                    {
-                        stateTimer.resetTimer();
-                        singleton3 = false;
-                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                    }
-
-
 
                     if (singleton)
                     {
                         stateTimer.resetTimer();
+                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
+                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
                         singleton = false;
                     }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.7)
-                    {
-                        singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
-                    }
+
                     if (stateTimer.getElapsedTimeSeconds() > 2.1)
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 2.3) {
-                            robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             follower.followPath(line7, true);
                             setPathState(7);
@@ -463,8 +506,6 @@ public class FivePlusZero extends OpMode {
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 2.3) {
-                            robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             setPathState(9);
                         }
@@ -535,8 +576,6 @@ public class FivePlusZero extends OpMode {
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 2.3) {
-                            robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             setPathState(11);
                         }
@@ -589,9 +628,6 @@ public class FivePlusZero extends OpMode {
                         singleton3 = false;
                     }
 
-                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                    robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-
                     if (singleton)
                     {
                         stateTimer.resetTimer();
@@ -606,8 +642,6 @@ public class FivePlusZero extends OpMode {
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
                         if (stateTimer.getElapsedTimeSeconds() > 2.3) {
-                            robot.intake.setClawPivot(0.6);
-                            robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
                             setPathState(13);
                         }
