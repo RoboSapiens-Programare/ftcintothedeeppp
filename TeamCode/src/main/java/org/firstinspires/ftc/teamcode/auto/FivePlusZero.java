@@ -40,8 +40,6 @@ import dev.frozenmilk.dairy.core.util.controller.calculation.pid.DoubleComponent
 @Autonomous(name = "5+0", group = "0. Autonomous")
 public class FivePlusZero extends OpMode {
 
-    // TODO fine tune positions and add claw pivot for last pickup
-
     private Robot robot = null;
     private Follower follower;
     private Timer stateTimer, pathTimer, transferTimer;
