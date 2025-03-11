@@ -50,6 +50,6 @@ public class ClawTest extends OpMode {
         */
 
 //        robot.intake.OpenIntake(UniversalValues.CLAW_CLOSE);
-        robot.intake.OpenIntake(UniversalValues.CLAW_CLOSE);
+        robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
     }
 }
