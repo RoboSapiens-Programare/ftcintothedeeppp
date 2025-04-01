@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.constants.UniversalValues;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
-@Disabled
-@Autonomous(name = "Transfer Test", group = "Subsystem Tests")
+//@Disabled
+@Autonomous(name = "Transfer Test", group = "Autonomous")
 public class TransferTest extends OpMode {
     private Robot robot;
     private Timer actionTimer;

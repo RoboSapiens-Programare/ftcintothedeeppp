@@ -37,91 +37,65 @@ public class TransferEmulatorTest extends OpMode {
         }
 
         if (transferStep == 0) {
-
-            robot.intake.OpenIntake(UniversalValues.CLAW_LOOSE);
             robot.intake.setClawPivot(UniversalValues.CLAW_VERTICAL + 0.2);
 
-            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+            robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
             robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
+            robot.intake.OpenIntake(UniversalValues.CLAW_LOOSE);
 
             ++transferStep;
         }
-        if (timer.getElapsedTimeSeconds() > 0.4) {
-            robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.8);
+        if (timer.getElapsedTimeSeconds() > 0.4 && transferStep == 1) {
+            robot.intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.6);
 
-            if (transferStep == 1) {
-                robot.intake.setPivot(UniversalValues.INTAKE_TRANSFER);
-                robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+            robot.intake.setPivot(1);
+            robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
 
-                ++transferStep;
-            }
+            ++transferStep;
+        }
 
-            if (timer.getElapsedTimeSeconds() > 0.9) {
-                if (transferStep == 2) {
-                    robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_CLOSE);
-                    ++transferStep;
-                }
+        if (timer.getElapsedTimeSeconds() > 0.9 && transferStep ==  2) {
+            robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
 
-                if (timer.getElapsedTimeSeconds() > 1.3) {
-                    if (transferStep == 3) {
-                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                        transferStep = -1;
-                    }
+            ++transferStep;
+        }
 
-                    if (timer.getElapsedTimeSeconds() > 1.5) {
-                        if (transferStep == 4) {
-                            robot.intake.setPivot(UniversalValues.INTAKE_TRANSFER - 0.2);
-                            //                        outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+        if (timer.getElapsedTimeSeconds() > 1.3 && transferStep == 3) {
+            robot.intake.setPivot(UniversalValues.INTAKE_TRANSFER - 0.2);
 
-                            ++transferStep;
-                        }
+            ++transferStep;
+        }
 
-                        if (timer.getElapsedTimeSeconds() > 1.9) {
-                            if (transferStep == 5) {
-                                robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+        if (timer.getElapsedTimeSeconds() > 1.5 && transferStep == 4) {
+            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
 
-                                ++transferStep;
-                            }
+            ++transferStep;
+        }
 
-                            if (timer.getElapsedTimeSeconds() > 2.1) {
-                                if (transferStep == 6) {
-                                    robot.intake.setPivot(UniversalValues.INTAKE_TRANSFER);
+        if (timer.getElapsedTimeSeconds() > 1.9 && transferStep == 5) {
+            robot.intake.setPivot(UniversalValues.INTAKE_TRANSFER);
 
+            ++transferStep;
+        }
 
-                                    ++transferStep;
-                                }
+        if (timer.getElapsedTimeSeconds() > 2.1 && transferStep == 6) {
+            robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
 
-                                if (timer.getElapsedTimeSeconds() > 2.5) {
-                                    if (transferStep == 7) {
-                                        robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+            ++transferStep;
+        }
 
+        if (timer.getElapsedTimeSeconds() > 2.5 && transferStep == 7) {
+            robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
 
-                                        ++transferStep;
-                                    }
+            ++transferStep;
+        }
 
-                                    if (timer.getElapsedTimeSeconds() > 2.7) {
-                                        if (transferStep == 8) {
-                                            robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                                            transferStep++;
-                                        }
-                                    }
+        if (timer.getElapsedTimeSeconds() > 2.7 && transferStep == 8) {
+            robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
+            robot.intake.setPivot(UniversalValues.INTAKE_INT);
 
-                                    if (timer.getElapsedTimeSeconds() > 2.9) {
-
-                                        if (transferStep == 9) {
-                                            robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
-                                            robot.intake.setPivot(UniversalValues.INTAKE_INT);
-
-                                            transferStep = -1;
-                                            transferCompleted = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            transferStep = -1;
+            transferCompleted = true;
         }
 
     }

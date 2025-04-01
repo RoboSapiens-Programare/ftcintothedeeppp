@@ -15,7 +15,7 @@ public class UniversalValues {
     public static double INTAKE_TRANSFER = 0.937;
 
     public static double CLAW_CLOSE = 0.1;
-    public static double CLAW_LOOSE = 0.212;
+    public static double CLAW_LOOSE = 0.215;
     public static double CLAW_OPEN = 0.45;
 
     public static double CLAW_VERTICAL = 0.4;
@@ -24,7 +24,7 @@ public class UniversalValues {
 
     public static double OUTTAKE_DUMP_BUCKET = 0.71;
     public static double OUTTAKE_DUMP_BUCKET_DIAG = 0.78;
-    public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.37;
+    public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.36;
     public static double OUTTAKE_COLLECT = 0.04;
 
     // TODO: review actual position
