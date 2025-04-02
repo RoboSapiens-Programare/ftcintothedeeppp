@@ -13,108 +13,103 @@ public class TwistTransfer {
     private Timer timer;
     private boolean timerSingleton = true;
     private int transferStep =  0;
+    private Timer barPickupTimer;
+    private int barPickupStep = 0;
 
     public TwistTransfer(Intake intake,
                              Outtake outtake) {
         this.intake = intake;
         this.outtake = outtake;
         timer = new Timer();
+        barPickupTimer = new Timer();
+    }
+
+    private boolean barPickup() {
+        if (barPickupStep == 0) {
+            intake.setPivot((UniversalValues.INTAKE_INT+UniversalValues.INTAKE_UP)/2);
+
+            ++barPickupStep;
+            return false;
+        }
+
+        if (barPickupStep == 1 && barPickupTimer.getElapsedTimeSeconds() > 0.3) {
+            intake.setPivot(UniversalValues.INTAKE_INT);
+
+            ++barPickupStep;
+            return  false;
+        }
+
+        if (barPickupStep == 2 && barPickupTimer.getElapsedTimeSeconds() > 0.6) {
+            barPickupStep = 0;
+            return  true;
+        }
+
+        return  false;
     }
 
     public void transfer() {
         if (timerSingleton) {
             timerSingleton = false;
             timer.resetTimer();
+            barPickupTimer.resetTimer();
         }
 
         if (transferStep == 0) {
 
-            intake.setClawPivot(UniversalValues.CLAW_FLIPPED);
+            intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
 
             outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
             outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
+            intake.OpenIntake(UniversalValues.CLAW_LOOSE);
+            intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.6);
+            intake.setPivot(UniversalValues.INTAKE_INT);
+
+            outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
+
+            if (this.barPickup())
+                ++transferStep;
+        }
+
+        if (timer.getElapsedTimeSeconds() > 0.4 && transferStep == 1) {
+            samplePickedUp = true;
+            intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+            ++transferStep;
+        }
+
+        if (timer.getElapsedTimeSeconds() > 0.6 && transferStep == 2) {
+            intake.setClawPivot(UniversalValues.CLAW_FLIPPED);
 
             ++transferStep;
         }
-        if (timer.getElapsedTimeSeconds() > 0.4) {
-            intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.6);
 
-            if (transferStep == 1) {
-                intake.setPivot(1);
-                intake.setPivot(UniversalValues.INTAKE_INT);
+        if (timer.getElapsedTimeSeconds() > 1.1 && transferStep == 3) {
+            intake.setPivot(UniversalValues.INTAKE_TRANSFER);
 
-                ++transferStep;
-            }
-
-            if (timer.getElapsedTimeSeconds() > 0.9) {
-                if (transferStep == 2) {
-                    intake.OpenIntake(UniversalValues.CLAW_LOOSE);
-                    ++transferStep;
-                }
-
-                if (timer.getElapsedTimeSeconds() > 1.3) {
-                    if (transferStep == 3) {
-                        samplePickedUp = true;
-                        intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                        ++transferStep;
-                    }
-
-                    if (timer.getElapsedTimeSeconds() > 1.5) {
-                        if (transferStep == 4) {
-                            intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
-
-                            ++transferStep;
-                        }
-
-                        if (timer.getElapsedTimeSeconds() > 1.9) {
-                            if (transferStep == 5) {
-                                outtake.setPivot(UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER);
-
-                                ++transferStep;
-                            }
-
-                            if (timer.getElapsedTimeSeconds() > 2.1) {
-                                if (transferStep == 6) {
-                                    intake.setPivot(UniversalValues.INTAKE_TRANSFER);
-
-
-                                    ++transferStep;
-                                }
-
-                                if (timer.getElapsedTimeSeconds() > 2.5) {
-                                    if (transferStep == 7) {
-                                        outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
-
-
-                                        ++transferStep;
-                                    }
-
-                                    if (timer.getElapsedTimeSeconds() > 2.7) {
-                                        if (transferStep == 8) {
-                                            intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                                            transferStep++;
-                                        }
-                                    }
-
-                                    if (timer.getElapsedTimeSeconds() > 2.9) {
-
-                                        if (transferStep == 9) {
-                                            outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
-                                            intake.setPivot(UniversalValues.INTAKE_INT);
-
-                                            transferStep = -1;
-                                            transferCompleted = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            ++transferStep;
         }
-    }
 
+        if (timer.getElapsedTimeSeconds() > 1.4 && transferStep == 4) {
+            outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+
+            ++transferStep;
+        }
+
+        if (timer.getElapsedTimeSeconds() > 1.6 && transferStep == 5) {
+            intake.CloseIntake(UniversalValues.CLAW_OPEN);
+            transferStep++;
+        }
+
+        if (timer.getElapsedTimeSeconds() > 1.8 && transferStep == 6) {
+
+            outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
+            intake.setPivot(UniversalValues.INTAKE_INT);
+            intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+
+            transferStep = -1;
+            transferCompleted = true;
+        }
+
+    }
 
 
     public void resetTransfer() {
