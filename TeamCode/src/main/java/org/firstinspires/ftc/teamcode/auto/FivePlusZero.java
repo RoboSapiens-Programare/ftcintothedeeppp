@@ -67,8 +67,10 @@ public class FivePlusZero extends OpMode {
     private final Pose samplePickup2 = new Pose(28, 9.1);
     private final Pose sampleDropOff2 = new Pose(28, 12.5);
     private final Pose samplePickup3 = new Pose(33, 7.75);
+    private final Pose sampleDropOff3 = new Pose(21.1, 24);
 
-    private final Pose specimenPickup = new Pose(21.1, 24, Math.toRadians(180));
+    private final Pose specimenPickup = new Pose(18.1, 47, Math.toRadians(225));
+
 
     private final Pose ParkPose = new Pose(15,27, Math.toRadians(180));
 
@@ -144,7 +146,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(specimenPickup)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(-32), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(-32), Math.toRadians(225))
                     .build();
 
             line8 = follower.pathBuilder()
@@ -154,7 +156,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(barCliponPose2)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(180))
                     .build();
 
             line9 = follower.pathBuilder()
@@ -164,7 +166,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(specimenPickup)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
                     .build();
 
             line10 = follower.pathBuilder()
@@ -174,7 +176,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(barCliponPose3)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(180))
                     .build();
 
             line11 = follower.pathBuilder()
@@ -184,7 +186,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(specimenPickup)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
                     .build();
 
             line12 = follower.pathBuilder()
@@ -194,7 +196,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(barCliponPose4)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(180))
                     .build();
 
             line13 = follower.pathBuilder()
@@ -204,7 +206,7 @@ public class FivePlusZero extends OpMode {
                                     new Point(specimenPickup)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
                     .build();
 
             line14 = follower.pathBuilder()
@@ -251,6 +253,10 @@ public class FivePlusZero extends OpMode {
 
                     singleton = false;
                 }
+                if (pathTimer.getElapsedTimeSeconds() > 0.2) {
+                    robot.intake.setPivot(INTAKE_INT);
+                }
+
                 if (!follower.isBusy()) {
                     if (singleton2) {
                         stateTimer.resetTimer();
@@ -280,16 +286,16 @@ public class FivePlusZero extends OpMode {
                     singleton2 = false;
                 }
 
-                if (!follower.isBusy() && singleton) {
+                if ((follower.getPose().getX() < (samplePickup1.getX() + 1) && follower.getPose().getY() < (samplePickup1.getY() + 1)) && singleton) {
                     stateTimer.resetTimer();
 
                     singleton = false;
 
-                } else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
+                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
                     stateTimer.resetTimer();
 
                     singleton = false;
-                }
+                } */
 
                 if (!singleton && stateTimer.getElapsedTimeSeconds() > 0.5) {
                     robot.intake.OpenIntake(CLAW_CLOSE);
@@ -315,11 +321,11 @@ public class FivePlusZero extends OpMode {
 
                     singleton = false;
 
-                } else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
+                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
                     stateTimer.resetTimer();
 
                     singleton = false;
-                }
+                } */
 
                 if (!singleton && stateTimer.getElapsedTimeSeconds() > 0.5) {
                     robot.intake.ManualLevel(INTAKE_EXTEND, 1);
@@ -353,10 +359,10 @@ public class FivePlusZero extends OpMode {
                     singleton = false;
                     robot.intake.ManualLevel(INTAKE_EXTEND, 1);
                     robot.intake.setPivot(INTAKE_DOWN);
-                } else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
+                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
                     stateTimer.resetTimer();
                     singleton = false;
-                }
+                } */
 
                 if (!singleton && stateTimer.getElapsedTimeSeconds()>0.7) {
                     setPathState(4);
@@ -370,7 +376,7 @@ public class FivePlusZero extends OpMode {
             case(4):
                 if (singleton2)
                 {
-                    follower.followPath(line5, false);
+                    follower.followPath(line5, true);
                     singleton2 = false;
                 }
 
@@ -378,10 +384,10 @@ public class FivePlusZero extends OpMode {
                 {
                     stateTimer.resetTimer();
                     singleton = false;
-                } else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
+                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
                     stateTimer.resetTimer();
                     singleton = false;
-                }
+                } */
 
                 if (!singleton && stateTimer.getElapsedTimeSeconds()>1) {
                     setPathState(5);
@@ -406,10 +412,10 @@ public class FivePlusZero extends OpMode {
                 if (!follower.isBusy() && singleton) {
                     stateTimer.resetTimer();
                     singleton = false;
-                } else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
+                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
                     stateTimer.resetTimer();
                     singleton = false;
-                }
+                } */
 
                 if (!singleton && stateTimer.getElapsedTimeSeconds()>1.2) {
                     setPathState(6);
@@ -432,8 +438,8 @@ public class FivePlusZero extends OpMode {
                 if (!follower.isBusy() && singleton4)
                 {
                     stateTimer.resetTimer();
-                    robot.intake.ManualLevel(INTAKE_EXTEND/2, 1);
-                    robot.intake.setPivot(INTAKE_DOWN);
+                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+                    robot.intake.setPivot(INTAKE_INT);
                     singleton4 = false;
                 }
 
@@ -459,10 +465,15 @@ public class FivePlusZero extends OpMode {
                         robot.intake.setPivot(UniversalValues.INTAKE_INT);
                         robot.intake.setClawPivot(CLAW_HORIZONTAL);
                         robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
                         singleton = false;
                     }
 
+
+                    if (stateTimer.getElapsedTimeSeconds() > 0.3)
+                    {
+                        robot.intake.setPivot(INTAKE_DOWN);
+                    }
                     if (stateTimer.getElapsedTimeSeconds() > 1.1)
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
@@ -484,7 +495,7 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line8, false);
                     singleton2 = false;
                 }
-                if (!follower.isBusy()) {
+                if ((follower.getPose().getX() > (barCliponPose2.getX() - 1) && follower.getPose().getY() > (barCliponPose2.getY() - 1))) {
                     if (robot.universalTransfer.isTransferCompleted()) {
                         if (singleton4)
                         {
@@ -520,7 +531,7 @@ public class FivePlusZero extends OpMode {
                     if (singleton3)
                     {
                         stateTimer.resetTimer();
-                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                        robot.intake.setPivot(INTAKE_DOWN);
                         robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
                         singleton3 = false;
                     }
@@ -535,7 +546,7 @@ public class FivePlusZero extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 0.1)
                     {
                         singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 0.5)
                     {
@@ -554,7 +565,7 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line10, false);
                     singleton2 = false;
                 }
-                if (!follower.isBusy()) {
+                if ((follower.getPose().getX() > (barCliponPose3.getX() - 1) && follower.getPose().getY() > (barCliponPose3.getY() - 1))) {
                     if (robot.universalTransfer.isTransferCompleted()) {
                         if (singleton4)
                         {
@@ -589,7 +600,7 @@ public class FivePlusZero extends OpMode {
 
                     if (singleton3)
                     {
-                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                        robot.intake.setPivot(INTAKE_DOWN);
                         robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
                         stateTimer.resetTimer();
                         singleton3 = false;
@@ -605,7 +616,7 @@ public class FivePlusZero extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 0.1)
                     {
                         singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 0.5)
                     {
@@ -624,7 +635,7 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line12, false);
                     singleton2 = false;
                 }
-                if (!follower.isBusy()) {
+                if ((follower.getPose().getX() > (barCliponPose4.getX() - 1) && follower.getPose().getY() > (barCliponPose4.getY() - 1))) {
                     if (robot.universalTransfer.isTransferCompleted()) {
                         if (singleton4)
                         {
@@ -659,6 +670,9 @@ public class FivePlusZero extends OpMode {
 
                     if (singleton3)
                     {
+                        robot.intake.setPivot(INTAKE_DOWN);
+                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
+
                         stateTimer.resetTimer();
                         singleton3 = false;
                     }
@@ -671,12 +685,14 @@ public class FivePlusZero extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 0.1)
                     {
                         singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_RETRACT+150, 1);
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 0.5)
                     {
                         robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 0.6) {
+                        robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+
+                        if (stateTimer.getElapsedTimeSeconds() > 0.8) {
 
                             setPathState(13);
                         }
@@ -690,7 +706,7 @@ public class FivePlusZero extends OpMode {
                     follower.followPath(line14, false);
                     singleton2 = false;
                 }
-                if (!follower.isBusy()) {
+                if ((follower.getPose().getX() > (barCliponPose5.getX() - 1) && follower.getPose().getY() > (barCliponPose5.getY() - 1))) {
                     if (robot.universalTransfer.isTransferCompleted()) {
                         if (singleton4)
                         {
@@ -737,7 +753,7 @@ public class FivePlusZero extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
 
         robot = new Robot(hardwareMap);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         stateTimer = new Timer();
         pathTimer = new Timer();
@@ -801,7 +817,7 @@ public class FivePlusZero extends OpMode {
     public void start() {
         setPathState(0);
         robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
-        robot.intake.setPivot(INTAKE_INIT);
+        robot.intake.setPivot(INTAKE_INIT-0.2);
     }
 
     @Override

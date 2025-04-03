@@ -57,8 +57,6 @@ public class TwistTransfer {
         if (transferStep == 0) {
 
             intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
-
-            outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
             outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
             intake.OpenIntake(UniversalValues.CLAW_LOOSE);
             intake.ManualLevel(UniversalValues.INTAKE_RETRACT, 0.6);

@@ -87,7 +87,7 @@ public class ParkSpecimen extends OpMode {
         robot = new Robot(hardwareMap);
 
 
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
         Constants.setConstants(FConstants.class, LConstants.class);
 

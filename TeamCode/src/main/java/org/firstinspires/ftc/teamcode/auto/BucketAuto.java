@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.constants.FConstants;
 import org.firstinspires.ftc.teamcode.constants.LConstants;
@@ -459,7 +460,7 @@ public class BucketAuto extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
 
         robot = new Robot(hardwareMap);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         stateTimer = new Timer();
         pathTimer = new Timer();

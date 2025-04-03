@@ -23,7 +23,7 @@ public class FConstants {
 
         FollowerConstants.useBrakeModeInTeleOp = true;
 
-        FollowerConstants.mass = 18;
+        FollowerConstants.mass = 10;
 
         FollowerConstants.xMovement = 75.34096617148526;
         FollowerConstants.yMovement = 55.33304819533794;
@@ -67,7 +67,6 @@ public class FConstants {
         FollowerConstants.holdPointHeadingScaling = 0.35;
         
         FollowerConstants.AVERAGED_VELOCITY_SAMPLE_NUMBER = 8;
-        FollowerConstants.BEZIER_CURVE_BINARY_STEP_LIMIT = 10;
         
         
         

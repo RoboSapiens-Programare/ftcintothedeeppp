@@ -368,7 +368,7 @@ public class smartFSMDriveMode extends OpMode {
         robot = new Robot(hardwareMap);
 
         Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         follower.setStartingPose(startPose);
         generatePaths();

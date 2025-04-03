@@ -420,7 +420,7 @@ public class ClipSpecimenOnBar extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
 
         robot = new Robot(hardwareMap);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
 
         stateTimer = new Timer();
         pathTimer = new Timer();
