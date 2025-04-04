@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.auto;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
-import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_VERTICAL;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_DOWN;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_INIT;
@@ -11,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_IN
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.INTAKE_RETRACT;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_CLOSE;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_COLLECT_NEW_TRANSFER;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_DUMP_BUCKET;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_EXTEND_SPECIMEN;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_OPEN;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.OUTTAKE_RETRACT;
@@ -35,8 +35,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
 import java.util.List;
 
-import dev.frozenmilk.dairy.core.util.controller.calculation.pid.DoubleComponent;
-
 @Autonomous(name = "5+0", group = "0. Autonomous")
 public class FivePlusZero extends OpMode {
 
@@ -44,9 +42,9 @@ public class FivePlusZero extends OpMode {
     private Follower follower;
     private Timer stateTimer, pathTimer, transferTimer;
     private boolean singleton = true;
+    private boolean stateTimerResetSingleton = true;
     private boolean singleton2 = true;
     private boolean singleton3 = true;
-    private boolean singleton4 = true;
     private int pathState;
 
     private DcMotorEx leftFront;
@@ -54,23 +52,26 @@ public class FivePlusZero extends OpMode {
     private DcMotorEx rightFront;
     private DcMotorEx rightRear;
 
+    // TODO: modify y offset to correct pedro path visualiser offset (currently about -5)
+
+
     private final Pose startPose = new Pose(8.5,44, Math.toRadians(180));
 
-    private final Pose barCliponPose1 = new Pose(36,60.5, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(36,63.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(36, 65.5, Math.toRadians(180));
-    private final Pose barCliponPose4 = new Pose(36, 67.5, Math.toRadians(180));
-    private final Pose barCliponPose5 = new Pose(36, 69.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(35.75,62.5, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(36.5,69.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(36.5, 73.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(36.7, 78.5, Math.toRadians(180));
+    private final Pose barCliponPose5 = new Pose(36.7, 80.5, Math.toRadians(180));
 
-    private final Pose samplePickup1 = new Pose(28, 19);
-    private final Pose sampleDropOff1 = new Pose(28, 18);
-    private final Pose samplePickup2 = new Pose(28, 9.1);
-    private final Pose sampleDropOff2 = new Pose(28, 12.5);
-    private final Pose samplePickup3 = new Pose(33, 7.75);
-    private final Pose sampleDropOff3 = new Pose(21.1, 24);
+    private final Pose samplePickup1 = new Pose(32.7, 28.2);
+    private final Pose sampleDropOff1 = new Pose(32.7, 26.7);
+    private final Pose samplePickup2 = new Pose(32.7, 24.2);
+    private final Pose sampleDropOff2 = new Pose(32.7, 20.7);
+    private final Pose samplePickup3 = new Pose(32.7, 16.2);
+    private final Pose sampleDropOff3 = new Pose(32.7, 21.7);
+
 
     private final Pose specimenPickup = new Pose(18.1, 47, Math.toRadians(225));
-
 
     private final Pose ParkPose = new Pose(15,27, Math.toRadians(180));
 
@@ -79,157 +80,156 @@ public class FivePlusZero extends OpMode {
 
     public void buildPaths() {
 
-            line1 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(startPose),
-                                    new Point(barCliponPose1)
-                            )
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
-                    .build();
+        line1 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(startPose),
+                                new Point(barCliponPose1)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line2 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(barCliponPose1),
-                                    new Point(samplePickup1)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(0))
-                    .build();
+        line2 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(barCliponPose1),
+                                new Point(samplePickup1)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-45))
+                .build();
 
-            line3 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(samplePickup1),
-                                    new Point(sampleDropOff1)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
-                    .build();
+        line3 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(samplePickup1),
+                                new Point(sampleDropOff1)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-170))
+                .build();
 
-            line4 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(sampleDropOff1),
-                                    new Point(samplePickup2)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(0))
-                    .build();
+        line4 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(sampleDropOff1),
+                                new Point(samplePickup2)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(-170), Math.toRadians(-45))
+                .build();
 
-            line5 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(samplePickup2),
-                                    new Point(sampleDropOff2)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(180))
-                    .build();
+        line5 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(samplePickup2),
+                                new Point(sampleDropOff2)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(-170))
+                .build();
 
-            line6 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(sampleDropOff2),
-                                    new Point(samplePickup3)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(-32))
-                    .build();
+        line6 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(sampleDropOff2),
+                                new Point(samplePickup3)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(-170), Math.toRadians(-45))
+                .build();
 
-            line7 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(samplePickup3),
-                                    new Point(specimenPickup)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(-32), Math.toRadians(225))
-                    .build();
+        line7 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(samplePickup3),
+                                new Point(sampleDropOff3)
+                        )
+                )
+                .setLinearHeadingInterpolation(Math.toRadians(-45), Math.toRadians(180))
+                .build();
 
-            line8 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(specimenPickup),
-                                    new Point(barCliponPose2)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(180))
-                    .build();
+        line8 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(sampleDropOff3),
+                                new Point(specimenPickup)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line9 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(barCliponPose2),
-                                    new Point(specimenPickup)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
-                    .build();
+        line9 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(specimenPickup),
+                                new Point(barCliponPose2)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line10 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(specimenPickup),
-                                    new Point(barCliponPose3)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(180))
-                    .build();
+        line10 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(barCliponPose2),
+                                new Point(specimenPickup)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line11 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(barCliponPose3),
-                                    new Point(specimenPickup)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
-                    .build();
+        line11 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(specimenPickup),
+                                new Point(barCliponPose3)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line12 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(specimenPickup),
-                                    new Point(barCliponPose4)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(180))
-                    .build();
+        line12 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(barCliponPose3),
+                                new Point(specimenPickup)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line13 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(barCliponPose4),
-                                    new Point(specimenPickup)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(225))
-                    .build();
+        line13 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(specimenPickup),
+                                new Point(barCliponPose4)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line14 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(specimenPickup),
-                                    new Point(barCliponPose5)
-                            )
-                    )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
-                    .build();
+        line14 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(barCliponPose4),
+                                new Point(specimenPickup)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
 
-            line15 = follower.pathBuilder()
-                    .addPath(
-                            new BezierLine(
-                                    new Point(barCliponPose5),
-                                    new Point(ParkPose)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
-                    .build();
+        line15 = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Point(specimenPickup),
+                                new Point(barCliponPose5)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
     }
-
     public void setPathState(int pState) {
         pathState = pState;
 
@@ -237,503 +237,292 @@ public class FivePlusZero extends OpMode {
         pathTimer.resetTimer();
         stateTimer.resetTimer();
         transferTimer.resetTimer();
+        stateTimerResetSingleton = true;
         singleton = true;
         singleton2 = true;
         singleton3 = true;
-        singleton4 = true;
+    }
+
+    private void resetState() {
+        if (stateTimerResetSingleton) {
+            stateTimer.resetTimer();
+            stateTimerResetSingleton = false;
+        }
     }
 
     public void autonomousUpdate() {
         switch(pathState) {
             case(0):
                 if (singleton) {
-                    follower.followPath(line1, false);
+                    robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
 
-                    robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
-
+                    follower.followPath(line1,true);
                     singleton = false;
-                }
-                if (pathTimer.getElapsedTimeSeconds() > 0.2) {
-                    robot.intake.setPivot(INTAKE_INT);
                 }
 
                 if (!follower.isBusy()) {
-                    if (singleton2) {
-                        stateTimer.resetTimer();
+                    resetState();
 
-                        singleton2 = false;
-                    }
-
-                    robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
-
-                    if (stateTimer.getElapsedTimeSeconds()>0.5) {
+                    robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 0.8);
+                    if (stateTimer.getElapsedTimeSeconds() > 0.5) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                        robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
-                        robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-
+                        robot.intake.setPivot(INTAKE_INT);
                         setPathState(1);
                     }
                 }
                 break;
             case(1):
                 if (singleton2) {
-                    follower.followPath(line2, false);
+                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
 
-                    robot.intake.OpenIntake(CLAW_OPEN);
-                    robot.intake.setPivot(INTAKE_DOWN);
-                    robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
 
+                    follower.followPath(line2,true);
                     singleton2 = false;
                 }
 
-                if ((follower.getPose().getX() < (samplePickup1.getX() + 1) && follower.getPose().getY() < (samplePickup1.getY() + 1)) && singleton) {
-                    stateTimer.resetTimer();
+                if (!follower.isBusy()) {
+                    resetState();
 
-                    singleton = false;
+                    if (singleton) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        robot.intake.setClawPivot(0.5);
+                        robot.intake.setPivot(INTAKE_DOWN);
 
-                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
-                    stateTimer.resetTimer();
+                        singleton = false;
+                    }
 
-                    singleton = false;
-                } */
+                    if (stateTimer.getElapsedTimeSeconds() > 0.1) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 0.4) {
+                            robot.intake.setPivot(INTAKE_INT);
+                            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+                            robot.intake.setClawPivot(CLAW_HORIZONTAL);
 
-                if (!singleton && stateTimer.getElapsedTimeSeconds() > 0.5) {
-                    robot.intake.OpenIntake(CLAW_CLOSE);
+                            setPathState(2);
+                        }
+                    }
 
-                }
-
-                if (!singleton && stateTimer.getElapsedTimeSeconds() > 0.7) {
-                    robot.intake.setPivot(INTAKE_INT);
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-
-                    setPathState(2);
                 }
                 break;
             case(2):
-                if (singleton3) {
-                    follower.followPath(line3, false);
-
-                    singleton3 = false;
-                }
-
-                if (!follower.isBusy() && singleton) {
-                    stateTimer.resetTimer();
-
-                    singleton = false;
-
-                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
-                    stateTimer.resetTimer();
-
-                    singleton = false;
-                } */
-
-                if (!singleton && stateTimer.getElapsedTimeSeconds() > 0.5) {
-                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    robot.intake.setPivot(INTAKE_DOWN);
-
-                }
-
-                if (!singleton && stateTimer.getElapsedTimeSeconds()>0.75) {
-                    robot.intake.OpenIntake(CLAW_OPEN);
-
-                }
-
-                if (!singleton && stateTimer.getElapsedTimeSeconds() > 1) {
-                    robot.intake.setPivot(INTAKE_INT);
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-
-                    setPathState(3);
-                }
-
-                break;
-            case(3):
-                if (singleton2)
-                {
-                    follower.followPath(line4, false);
+                if (singleton2) {
+                    follower.followPath(line3,true);
                     singleton2 = false;
                 }
 
-                if (!follower.isBusy() && singleton)
-                {
-                    stateTimer.resetTimer();
-                    singleton = false;
-                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    robot.intake.setPivot(INTAKE_DOWN);
-                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
-                    stateTimer.resetTimer();
-                    singleton = false;
-                } */
+                if (!follower.isBusy()) {
+                    resetState();
 
-                if (!singleton && stateTimer.getElapsedTimeSeconds()>0.7) {
-                    setPathState(4);
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-                } else if (!singleton && stateTimer.getElapsedTimeSeconds()>0.7) {
-                    robot.intake.setPivot(INTAKE_INT);
-                } else if (!singleton && stateTimer.getElapsedTimeSeconds()>0.5) {
-                    robot.intake.OpenIntake(CLAW_CLOSE);
+                    if (singleton) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        singleton = false;
+                    }
+                    robot.intake.setPivot(INTAKE_DOWN);
+
+                    if (stateTimer.getElapsedTimeSeconds() > 0.1) {
+                        robot.intake.OpenIntake(CLAW_OPEN);
+                        if (stateTimer.getElapsedTimeSeconds() > 0.4) {
+                            robot.intake.setPivot(INTAKE_INT);
+                            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+                            setPathState(3);
+                        }
+                    }
+                }
+                break;
+            case(3):
+                if (singleton2) {
+                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+
+                    follower.followPath(line4,true);
+                    singleton2 = false;
+                }
+
+                if (!follower.isBusy()) {
+                    resetState();
+
+                    if (singleton) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        robot.intake.setClawPivot(0.5);
+                        robot.intake.setPivot(INTAKE_DOWN);
+
+                        singleton = false;
+                    }
+
+                    if (stateTimer.getElapsedTimeSeconds() > 0.1) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 0.4) {
+                            robot.intake.setPivot(INTAKE_INT);
+                            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+                            robot.intake.setClawPivot(CLAW_HORIZONTAL);
+
+                            setPathState(4);
+                        }
+                    }
+
                 }
                 break;
             case(4):
-                if (singleton2)
-                {
-                    follower.followPath(line5, true);
+                if (singleton2) {
+                    follower.followPath(line5,true);
                     singleton2 = false;
                 }
 
-                if (!follower.isBusy() && singleton)
-                {
-                    stateTimer.resetTimer();
-                    singleton = false;
-                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
-                    stateTimer.resetTimer();
-                    singleton = false;
-                } */
+                if (!follower.isBusy()) {
+                    resetState();
 
-                if (!singleton && stateTimer.getElapsedTimeSeconds()>1) {
-                    setPathState(5);
-                    robot.intake.setPivot(INTAKE_INT);
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-                } else if (!singleton && stateTimer.getElapsedTimeSeconds()>0.75) {
-                    robot.intake.OpenIntake(CLAW_OPEN);
-                } else if (!singleton && stateTimer.getElapsedTimeSeconds()>0.5) {
-                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+                    if (singleton) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        singleton = false;
+                    }
                     robot.intake.setPivot(INTAKE_DOWN);
+
+                    if (stateTimer.getElapsedTimeSeconds() > 0.1) {
+                        robot.intake.OpenIntake(CLAW_OPEN);
+                        if (stateTimer.getElapsedTimeSeconds() > 0.4) {
+                            robot.intake.setPivot(INTAKE_INT);
+                            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+                            setPathState(5);
+                        }
+                    }
                 }
                 break;
             case(5):
-                if (singleton3)
-                {
-                    follower.followPath(line6, false);
-                    singleton3 = false;
-                    robot.intake.setPivot(INTAKE_DOWN);
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
+                if (singleton2) {
+                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
+
+                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 0.8);
+
+                    follower.followPath(line6,true);
+                    singleton2 = false;
                 }
 
-                if (!follower.isBusy() && singleton) {
-                    stateTimer.resetTimer();
-                    singleton = false;
-                } /* else if (pathTimer.getElapsedTimeSeconds()>2 && singleton) {
-                    stateTimer.resetTimer();
-                    singleton = false;
-                } */
+                if (!follower.isBusy()) {
+                    resetState();
 
-                if (!singleton && stateTimer.getElapsedTimeSeconds()>1.2) {
-                    setPathState(6);
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-                } else if (!singleton && stateTimer.getElapsedTimeSeconds()>1) {
-                    robot.intake.OpenIntake(CLAW_CLOSE);
-                } else if (!singleton && stateTimer.getElapsedTimeSeconds()>0.3) {
-                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    robot.intake.setClawPivot(0.79);
+                    if (singleton) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
+                        robot.intake.setClawPivot(0.5);
+                        robot.intake.setPivot(INTAKE_DOWN);
+
+                        singleton = false;
+                    }
+
+                    if (stateTimer.getElapsedTimeSeconds() > 0.1) {
+                        robot.intake.CloseIntake(CLAW_CLOSE);
+                        if (stateTimer.getElapsedTimeSeconds() > 0.4) {
+                            robot.intake.setPivot(INTAKE_INT);
+                            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
+                            robot.intake.setClawPivot(CLAW_HORIZONTAL);
+
+                            setPathState(6);
+                        }
+                    }
 
                 }
                 break;
             case(6):
-                if (singleton2)
-                {
-                    follower.followPath(line7, false);
+                if (singleton2) {
+                    follower.followPath(line7,true);
                     singleton2 = false;
                 }
 
-                if (!follower.isBusy() && singleton4)
-                {
-                    stateTimer.resetTimer();
-                    robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    robot.intake.setPivot(INTAKE_INT);
-                    singleton4 = false;
-                }
+                if (!follower.isBusy()) {
+                    resetState();
 
-                if (stateTimer.getElapsedTimeSeconds()>0.5 && singleton && !singleton4)
-                {
-                    robot.intake.OpenIntake(CLAW_OPEN);
-                }
-
-                if (stateTimer.getElapsedTimeSeconds()>1 && singleton && !singleton4) {
-                    robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                }
-
-                if (singleton4){
-                    stateTimer.resetTimer();
-                }
-
-                if (stateTimer.getElapsedTimeSeconds()>1.2 || !singleton) {
-
-                    if (singleton)
-                    {
-                        stateTimer.resetTimer();
-                        robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                        robot.intake.setClawPivot(CLAW_HORIZONTAL);
-                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
+                    if (singleton) {
+                        robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                         singleton = false;
                     }
+                    robot.intake.setPivot(INTAKE_DOWN);
 
-
-                    if (stateTimer.getElapsedTimeSeconds() > 0.3)
-                    {
-                        robot.intake.setPivot(INTAKE_DOWN);
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 1.1)
-                    {
-                        robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 1.3) {
-
-                            follower.followPath(line7, true);
+                    if (stateTimer.getElapsedTimeSeconds() > 0.1) {
+                        robot.intake.OpenIntake(CLAW_OPEN);
+                        if (stateTimer.getElapsedTimeSeconds() > 0.4) {
+                            robot.intake.setPivot(INTAKE_INT);
+                            robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
                             setPathState(7);
-                            // starts cycling
                         }
                     }
                 }
                 break;
-
-
             case(7):
-                robot.universalTransfer.transfer();
                 if (singleton2)
                 {
-                    follower.followPath(line8, false);
+                    follower.followPath(line8,true);
                     singleton2 = false;
                 }
-                if ((follower.getPose().getX() > (barCliponPose2.getX() - 1) && follower.getPose().getY() > (barCliponPose2.getY() - 1))) {
-                    if (robot.universalTransfer.isTransferCompleted()) {
-                        if (singleton4)
-                        {
-                            stateTimer.resetTimer();
-                            singleton4 = false;
-                        }
-
-                        if (stateTimer.getElapsedTimeSeconds() > 0.25) {
-                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
-                            if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                                if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
-                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-
-                                    robot.universalTransfer.resetTransfer();
-                                    setPathState(8);
-                                }
-                            }
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    resetState();
+                    setPathState(8);
                 }
                 break;
             case(8):
-                if (singleton2)
+                if (singleton3)
                 {
-                    follower.followPath(line9, false);
-                    singleton2 = false;
+                    follower.followPath(line9,true);
+                    singleton3 = false;
                 }
-
-                if (!follower.isBusy() || !singleton) {
-
-                    if (singleton3)
-                    {
-                        stateTimer.resetTimer();
-                        robot.intake.setPivot(INTAKE_DOWN);
-                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                        singleton3 = false;
-                    }
-
-
-
-                    if (singleton)
-                    {
-                        stateTimer.resetTimer();
-                        singleton = false;
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 0.1)
-                    {
-                        singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 0.5)
-                    {
-                        robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 0.6) {
-
-                            setPathState(9);
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    setPathState(9);
                 }
                 break;
             case(9):
-                robot.universalTransfer.transfer();
-                if (singleton2)
+                if (singleton)
                 {
-                    follower.followPath(line10, false);
-                    singleton2 = false;
+                    follower.followPath(line10,true);
+                    singleton = false;
                 }
-                if ((follower.getPose().getX() > (barCliponPose3.getX() - 1) && follower.getPose().getY() > (barCliponPose3.getY() - 1))) {
-                    if (robot.universalTransfer.isTransferCompleted()) {
-                        if (singleton4)
-                        {
-                            stateTimer.resetTimer();
-                            singleton4 = false;
-                        }
-
-                        if (stateTimer.getElapsedTimeSeconds() > 0.25) {
-                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
-                            if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                                if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
-                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-
-                                    robot.universalTransfer.resetTransfer();
-                                    setPathState(10);
-                                }
-                            }
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    setPathState(10);
                 }
                 break;
             case(10):
                 if (singleton2)
                 {
-                    follower.followPath(line11, false);
+                    follower.followPath(line11,true);
                     singleton2 = false;
                 }
-
-                if (!follower.isBusy() || !singleton) {
-
-                    if (singleton3)
-                    {
-                        robot.intake.setPivot(INTAKE_DOWN);
-                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-                        stateTimer.resetTimer();
-                        singleton3 = false;
-                    }
-
-
-
-                    if (singleton)
-                    {
-                        stateTimer.resetTimer();
-                        singleton = false;
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 0.1)
-                    {
-                        singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 0.5)
-                    {
-                        robot.intake.OpenIntake(CLAW_CLOSE);
-                        if (stateTimer.getElapsedTimeSeconds() > 0.6) {
-
-                            setPathState(11);
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    setPathState(11);
                 }
                 break;
             case(11):
-                robot.universalTransfer.transfer();
-                if (singleton2)
+                if (singleton3)
                 {
-                    follower.followPath(line12, false);
-                    singleton2 = false;
+                    follower.followPath(line12,true);
+                    singleton3 = false;
                 }
-                if ((follower.getPose().getX() > (barCliponPose4.getX() - 1) && follower.getPose().getY() > (barCliponPose4.getY() - 1))) {
-                    if (robot.universalTransfer.isTransferCompleted()) {
-                        if (singleton4)
-                        {
-                            stateTimer.resetTimer();
-                            singleton4 = false;
-                        }
-
-                        if (stateTimer.getElapsedTimeSeconds() > 0.25) {
-                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
-                            if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                                if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
-                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-
-                                    robot.universalTransfer.resetTransfer();
-                                    setPathState(12);
-                                }
-                            }
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    setPathState(12);
                 }
                 break;
             case(12):
-                if (singleton2)
+                if (singleton)
                 {
-                    follower.followPath(line13, false);
-                    singleton2 = false;
+                    follower.followPath(line13,true);
+                    singleton = false;
                 }
-
-                if (!follower.isBusy() || !singleton) {
-
-                    if (singleton3)
-                    {
-                        robot.intake.setPivot(INTAKE_DOWN);
-                        robot.intake.CloseIntake(UniversalValues.CLAW_OPEN);
-
-                        stateTimer.resetTimer();
-                        singleton3 = false;
-                    }
-
-                    if (singleton)
-                    {
-                        stateTimer.resetTimer();
-                        singleton = false;
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 0.1)
-                    {
-                        singleton3 = false;
-                        robot.intake.ManualLevel(INTAKE_EXTEND, 1);
-                    }
-                    if (stateTimer.getElapsedTimeSeconds() > 0.5)
-                    {
-                        robot.intake.OpenIntake(CLAW_CLOSE);
-                        robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-
-                        if (stateTimer.getElapsedTimeSeconds() > 0.8) {
-
-                            setPathState(13);
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    setPathState(13);
                 }
                 break;
             case(13):
-                robot.universalTransfer.transfer();
                 if (singleton2)
                 {
-                    follower.followPath(line14, false);
+                    follower.followPath(line14,true);
                     singleton2 = false;
                 }
-                if ((follower.getPose().getX() > (barCliponPose5.getX() - 1) && follower.getPose().getY() > (barCliponPose5.getY() - 1))) {
-                    if (robot.universalTransfer.isTransferCompleted()) {
-                        if (singleton4)
-                        {
-                            stateTimer.resetTimer();
-                            singleton4 = false;
-                        }
-
-                        if (stateTimer.getElapsedTimeSeconds() > 0.25) {
-                            robot.outtake.ManualLevel(OUTTAKE_EXTEND_SPECIMEN, 1);
-                            if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                                if (stateTimer.getElapsedTimeSeconds() > 0.5) {
-                                    robot.outtake.ManualLevel(OUTTAKE_RETRACT, 1);
-                                    robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
-
-                                    robot.universalTransfer.resetTransfer();
-                                    setPathState(14);
-                                }
-                            }
-                        }
-                    }
+                if (!follower.isBusy()) {
+                    setPathState(14);
                 }
                 break;
             case(14):
                 if (singleton3)
                 {
-                    follower.followPath(line15, false);
+                    follower.followPath(line15,true);
                     singleton3 = false;
                 }
                 if (!follower.isBusy()) {
@@ -753,7 +542,7 @@ public class FivePlusZero extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
 
         robot = new Robot(hardwareMap);
-        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower = new Follower(hardwareMap, LConstants.class, FConstants.class);
 
         stateTimer = new Timer();
         pathTimer = new Timer();
@@ -788,14 +577,9 @@ public class FivePlusZero extends OpMode {
     public void loop() {
 
         follower.update();
-//        if (singleton3) {
-//            robot.intake.ManualLevel(INTAKE_RETRACT, 1);
-//        }
         autonomousUpdate();
 
         telemetry.addData("path state", pathState);
-        telemetry.addData("path timer", pathTimer.getElapsedTimeSeconds());
-        telemetry.addData("state timer", stateTimer.getElapsedTimeSeconds());
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
@@ -817,7 +601,7 @@ public class FivePlusZero extends OpMode {
     public void start() {
         setPathState(0);
         robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
-        robot.intake.setPivot(INTAKE_INIT-0.2);
+        robot.intake.setPivot(INTAKE_INIT);
     }
 
     @Override
