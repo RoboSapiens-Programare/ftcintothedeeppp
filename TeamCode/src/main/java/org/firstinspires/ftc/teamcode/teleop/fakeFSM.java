@@ -572,7 +572,7 @@ public class fakeFSM extends OpMode {
     @Override
     public void init() {
         robot = new Robot(hardwareMap);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         intakeTimer.reset();
         outtakeTimer.reset();
         telemetry.addData("Status", "Initialized");

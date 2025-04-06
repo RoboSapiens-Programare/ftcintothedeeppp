@@ -245,6 +245,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     {
 
                         stateTimer.resetTimer();
+                        robot.intake.setClawPivot(CLAW_HORIZONTAL);
                         singleton = false;
                     }
                     if (stateTimer.getElapsedTimeSeconds() > 1.7)
@@ -301,6 +302,7 @@ public class ClipSpecimenOnBar extends OpMode {
 
                     if (singleton) {
 
+                        robot.intake.setClawPivot(CLAW_HORIZONTAL);
                         stateTimer.resetTimer();
                         singleton = false;
                     }
@@ -359,6 +361,8 @@ public class ClipSpecimenOnBar extends OpMode {
 
                     if (singleton) {
 
+
+                        robot.intake.setClawPivot(CLAW_HORIZONTAL);
                         stateTimer.resetTimer();
                         singleton = false;
                     }
