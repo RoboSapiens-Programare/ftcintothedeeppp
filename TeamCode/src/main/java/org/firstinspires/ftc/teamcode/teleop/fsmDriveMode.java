@@ -10,6 +10,7 @@ import static com.pedropathing.follower.FollowerConstants.rightFrontMotorName;
 import static com.pedropathing.follower.FollowerConstants.rightRearMotorDirection;
 import static com.pedropathing.follower.FollowerConstants.rightRearMotorName;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_CLOSE;
+import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_FLIPPED;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_HORIZONTAL;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_OPEN;
 import static org.firstinspires.ftc.teamcode.constants.UniversalValues.CLAW_VERTICAL;
@@ -197,8 +198,8 @@ public class fsmDriveMode extends OpMode {
 
 
         if(gamepad1.square){
+            robot.intake.setClawPivot(CLAW_FLIPPED);
             robot.intake.setPivot(INTAKE_INT);
-            robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
             wallCollect = true;
             noTransfer = false;

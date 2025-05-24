@@ -33,7 +33,7 @@ public class UniversalTransfer {
 
 //            intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
             //intake.setClawPivot(UniversalValues.CLAW_VERTICAL + 0.2);
-            intake.setClawPivot(UniversalValues.CLAW_FLIPPED);
+            intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
 
             outtake.setPivot(UniversalValues.OUTTAKE_DUMP_BUCKET);
             outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);

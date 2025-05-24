@@ -65,9 +65,9 @@ public class BucketAuto extends OpMode {
 
     private final Pose startPose = new Pose(9.750 + OFFSET_X, 107.000 + OFFSET_Y, Math.toRadians(-90));
     private final Pose scorePose = new Pose(15.750 + OFFSET_X, 126.250 + OFFSET_Y, Math.toRadians(-45));
-    private final Pose grabFirstSamplePose = new Pose(30.700 + OFFSET_X, 128 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabSecodSamplePose = new Pose(30.200 + OFFSET_X, 117.500 + OFFSET_Y, Math.toRadians(0));
-    private final Pose grabThirdSamplePose = new Pose(34.5 + OFFSET_X, 127.800 + OFFSET_Y, Math.toRadians(35));
+    private final Pose grabFirstSamplePose = new Pose(28.700 + OFFSET_X, 128 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabSecodSamplePose = new Pose(28.200 + OFFSET_X, 117.500 + OFFSET_Y, Math.toRadians(0));
+    private final Pose grabThirdSamplePose = new Pose(32.5 + OFFSET_X, 127.800 + OFFSET_Y, Math.toRadians(35));
     private final Pose parkPose = new Pose(62.500 + OFFSET_X, 94.000 + OFFSET_Y, Math.toRadians(90));
 
 
@@ -190,22 +190,22 @@ public class BucketAuto extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0 && stateStep == 0) {
                         robot.outtake.ManualLevel(OUTTAKE_EXTEND, 1);
                         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.5 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.1 && stateStep == 1) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 2.1 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
-                    if (poseTimer.getElapsedTimeSeconds() > 2.35 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.75 && stateStep == 3) {
                         follower.followPath(grabFirstSample, true);
                         setPathState(2);
                     }
@@ -263,18 +263,18 @@ public class BucketAuto extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
 
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.9 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.1 && stateStep == 2) {
                         robot.intake.setPivot(INTAKE_INT);
 
                         follower.followPath(grabSecondSample, true);
@@ -297,23 +297,23 @@ public class BucketAuto extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0. && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.3 && stateStep == 0) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                         sliderManip = false;
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0.7 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.6 && stateStep == 1) {
                         robot.intake.setPivot(INTAKE_DOWN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.1 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 2) {
                         robot.intake.CloseIntake(CLAW_CLOSE);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.3 && stateStep == 3) {
                         robot.universalTransfer.transfer();
                         if (robot.universalTransfer.isTransferCompleted()) {
                             robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
@@ -335,18 +335,18 @@ public class BucketAuto extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
 
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.9 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.1 && stateStep == 2) {
                         robot.intake.setPivot(INTAKE_INT);
 
                         follower.followPath(grabThirdSample, true);
@@ -370,31 +370,31 @@ public class BucketAuto extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.2 && stateStep == 0) {
                         robot.intake.setPivot(INTAKE_DOWN);
 
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 0.7 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.4 && stateStep == 1) {
                         robot.intake.ManualLevel(INTAKE_EXTEND, 0.8);
                         sliderManip = false;
 
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.1 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.8 && stateStep == 2) {
                         robot.intake.CloseIntake(CLAW_CLOSE);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 3) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 3) {
                         robot.intake.ManualLevel(INTAKE_RETRACT, 0.8);
                         robot.intake.setPivot(INTAKE_UP);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.7 && stateStep == 4) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.3 && stateStep == 4) {
                         robot.universalTransfer.transfer();
                         if (robot.universalTransfer.isTransferCompleted()) {
                             robot.outtake.ManualLevel(OUTTAKE_EXTEND, 0.8);
@@ -417,17 +417,17 @@ public class BucketAuto extends OpMode {
                         timerResetSingleton = false;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1 && stateStep == 0) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.5 && stateStep == 0) {
                         robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET_DIAG);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.4 && stateStep == 1) {
+                    if (poseTimer.getElapsedTimeSeconds() > 0.9 && stateStep == 1) {
                         robot.outtake.OpenOuttake(OUTTAKE_OPEN);
                         ++stateStep;
                     }
 
-                    if (poseTimer.getElapsedTimeSeconds() > 1.6 && stateStep == 2) {
+                    if (poseTimer.getElapsedTimeSeconds() > 1.1 && stateStep == 2) {
 
                         robot.outtake.setPivot(OUTTAKE_COLLECT_NEW_TRANSFER);
 

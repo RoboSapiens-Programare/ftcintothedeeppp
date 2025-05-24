@@ -24,7 +24,7 @@ public class UniversalValues {
 
     public static double OUTTAKE_DUMP_BUCKET = 0.71;
     public static double OUTTAKE_DUMP_BUCKET_DIAG = 0.78;
-    public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.37;
+    public static double OUTTAKE_COLLECT_NEW_TRANSFER = 0.385;
     public static double OUTTAKE_COLLECT = 0.04;
 
     // TODO: review actual position
