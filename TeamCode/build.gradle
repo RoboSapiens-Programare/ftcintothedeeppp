@@ -16,11 +16,11 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url "https://repo.dairy.foundation/snapshots"
+            url = "https://repo.dairy.foundation/releases"
         }
     }
     dependencies {
-        classpath "dev.frozenmilk.sinister.sloth:Load:0.0.2"
+        implementation("dev.frozenmilk.sinister:Sloth:0.2.2")
     }
 }
 
